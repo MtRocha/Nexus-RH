@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>EasyCollector</title>
+        <link href="../App_Themes/css/operacao/cliente.css?versaoAPPSite=20250114142532" rel="stylesheet" type="text/css"/>
+        <link href="../App_Themes/css/cadastro/flexboxcadastro.css?versaoAPPSite=20250114142532" rel="stylesheet"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    </head>
+    <body onresize="ajustarAltura();" onkeydown="return(pegarTeclaPressionada());">
+        <form method="post" action="./cliente.aspx?versaoAPPSite=20250114142532" id="formCliente">
+            <div class="aspNetHidden">
+                <input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwULLTE2MDA3OTE5OTQPZBYCZg9kFigCDw8PFgIeB1Zpc2libGVoZGQCEQ8PFgIfAGhkZAIVDw8WAh8AaGRkAhcPDxYCHwBoZGQCGQ8WAh8AaGQCGw8WAh8AaGQCHQ8WAh8AaGQCHw8PFgIfAGhkZAInDw9kFgQeB29uQ2xpY2sFR2phdmFzY3JpcHQ6ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3R4dENhbXBvUGVzcXVpc2EnKS52YWx1ZSA9IHRoaXMuaWQ7HglvbktleURvd24FR2phdmFzY3JpcHQ6ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3R4dENhbXBvUGVzcXVpc2EnKS52YWx1ZSA9IHRoaXMuaWQ7ZAIrDw9kFgQfAQVHamF2YXNjcmlwdDpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndHh0Q2FtcG9QZXNxdWlzYScpLnZhbHVlID0gdGhpcy5pZDsfAgVHamF2YXNjcmlwdDpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndHh0Q2FtcG9QZXNxdWlzYScpLnZhbHVlID0gdGhpcy5pZDtkAi8PD2QWBB8BBUdqYXZhc2NyaXB0OmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0eHRDYW1wb1Blc3F1aXNhJykudmFsdWUgPSB0aGlzLmlkOx8CBUdqYXZhc2NyaXB0OmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0eHRDYW1wb1Blc3F1aXNhJykudmFsdWUgPSB0aGlzLmlkO2QCNw8PZBYEHwEFR2phdmFzY3JpcHQ6ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3R4dENhbXBvUGVzcXVpc2EnKS52YWx1ZSA9IHRoaXMuaWQ7HwIFR2phdmFzY3JpcHQ6ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3R4dENhbXBvUGVzcXVpc2EnKS52YWx1ZSA9IHRoaXMuaWQ7ZAI/Dw9kFgQfAQVHamF2YXNjcmlwdDpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndHh0Q2FtcG9QZXNxdWlzYScpLnZhbHVlID0gdGhpcy5pZDsfAgVHamF2YXNjcmlwdDpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndHh0Q2FtcG9QZXNxdWlzYScpLnZhbHVlID0gdGhpcy5pZDtkAkMPD2QWBB8BBUdqYXZhc2NyaXB0OmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0eHRDYW1wb1Blc3F1aXNhJykudmFsdWUgPSB0aGlzLmlkOx8CBUdqYXZhc2NyaXB0OmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0eHRDYW1wb1Blc3F1aXNhJykudmFsdWUgPSB0aGlzLmlkO2QCRw8PZBYEHwEFR2phdmFzY3JpcHQ6ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3R4dENhbXBvUGVzcXVpc2EnKS52YWx1ZSA9IHRoaXMuaWQ7HwIFR2phdmFzY3JpcHQ6ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3R4dENhbXBvUGVzcXVpc2EnKS52YWx1ZSA9IHRoaXMuaWQ7ZAJLDw9kFgQfAQVHamF2YXNjcmlwdDpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndHh0Q2FtcG9QZXNxdWlzYScpLnZhbHVlID0gdGhpcy5pZDsfAgVHamF2YXNjcmlwdDpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndHh0Q2FtcG9QZXNxdWlzYScpLnZhbHVlID0gdGhpcy5pZDtkAk8PD2QWBB8BBUdqYXZhc2NyaXB0OmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0eHRDYW1wb1Blc3F1aXNhJykudmFsdWUgPSB0aGlzLmlkOx8CBUdqYXZhc2NyaXB0OmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0eHRDYW1wb1Blc3F1aXNhJykudmFsdWUgPSB0aGlzLmlkO2QCUw8PZBYEHwEFR2phdmFzY3JpcHQ6ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3R4dENhbXBvUGVzcXVpc2EnKS52YWx1ZSA9IHRoaXMuaWQ7HwIFR2phdmFzY3JpcHQ6ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3R4dENhbXBvUGVzcXVpc2EnKS52YWx1ZSA9IHRoaXMuaWQ7ZAJbDw9kFgQfAQVHamF2YXNjcmlwdDpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndHh0Q2FtcG9QZXNxdWlzYScpLnZhbHVlID0gdGhpcy5pZDsfAgVHamF2YXNjcmlwdDpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndHh0Q2FtcG9QZXNxdWlzYScpLnZhbHVlID0gdGhpcy5pZDtkAl8PD2QWBB8BBUdqYXZhc2NyaXB0OmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0eHRDYW1wb1Blc3F1aXNhJykudmFsdWUgPSB0aGlzLmlkOx8CBUdqYXZhc2NyaXB0OmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0eHRDYW1wb1Blc3F1aXNhJykudmFsdWUgPSB0aGlzLmlkO2QYAQUeX19Db250cm9sc1JlcXVpcmVQb3N0QmFja0tleV9fFgEFDGNtZFBlc3F1aXNhcnGUtv1ORHh9DA49K9TgepmpZ/YaElSbw5O86V8J29vz"/>
+            </div>
+            <div class="aspNetHidden">
+                <input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="C0EDBA8F"/>
+                <input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/wEdACHYI5CFT65NOutH7emXRFh4j3TCvtT+pPcDR1ywRQOWcouNUL2Ln8S9bcL2IRJOp2KFrx8yql1V+B2IhzLBCnX0P1kgiDyhFL5MpOALKAW0PDuRHtMy8RB1ZbFauqqr8dkBcGLaXW0bgBT1Nt3MTLJoAqCvgHABmd10vIx4qJvvGKNiwE+/KPg2mfEp7HE3HpZNs72yNlEN4pzhCXGQDQDvZjhQOkADzbbVksf/eQJiBRwsq9NoFy7br0BIsn8o17HVBOUSPY1DQphUobU+JS1Y6Qqkq+BjbIgUjqXWYtdLBq7JbPxP5yMvX+cWFYXSQ8jhi+mTJivAfoiRl2I7psPeFIO9cqlKXU7E3rDEK5zMo0MHZh9ZuPBRie2vA/HfoRIDexr0IsCJjQ1GDAX0QlAa0IzXQCfl2NE1UHeR5BvBPb9EHir596VfgPK9mUNJldEVjjWoQmr1M0PpwYmqU4Qhic/b93obhYQehpFZUQryYsfGuNImpu9BENffuZjqweBKdJmrf4m1TeRcoisrA9RZ6IXFgA0e1snIJXiV1FSdvbWOsBwTIjNP2oJIG4mL6wpavv7MwIO1Vc94vzHqiGFVq0djzP+QkxqzC9Elnc3pq2wkPlG7XwZTtKc1xnhoR1D7k5bYsaXaAG94hicFZbE2RpA+J1A7Xl9D9xEkgalgQqBT5MxnjNHRNU5n4eaRp+cDXGZeZm1TGLmsuIr9us/xobmjtkkYCDgSmxDLK3t3Zg=="/>
+            </div>
+            <div style="display: flex; flex-direction: row;">
+                <div style="width: 20%; min-width: 20%; max-width: 20%; display: flex; align-items: center;">
+                    <div style="font-family: Arial, Helvetica, sans-serif; font-size: medium; font-weight: bolder; color: orange; border-top: 1px solid GrayText; border-bottom: 1px solid GrayText;">
+                        <span id="lblTitulo" accesskey="1">dados do cliente</span>
+                    </div>
+                </div>
+                <div style="width: 80%; justify-content: flex-end; display: flex; align-items: center; flex-wrap: nowrap; background-color: transparent; min-width: 200px; flex-direction: row; line-height: 27px; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                    <div class="divBarraFerramenta2" id="divBarraFerramentaDiscador" style="visibility: hidden; display: none;">
+                        <div style="width: auto;">
+                            <span id="lblTempoDecorrido" title="Tempo em segundos decorrido no status atual."></span>
+                        </div>
+                        <div>
+                            <img alt="Desligar." id="cmdDesligar" src="../App_Themes/icone/hangup.png" title="Desligar." onclick="hangUp();" class="cmdDesligar"/>
+                        </div>
+                        <div style="width: auto;">
+                            <span id="lblTelefoneFalando" title="Telefone discado." class="lblTelefoneFalando"></span>
+                        </div>
+                        <div style="width: auto;">
+                            <span id="lblTempoPausaCliente" title="Tempo de pausa do cliente." class="lblTempoPausaCliente"></span>
+                        </div>
+                        <div>
+                            <img alt="Finalizar ligação caiu" id="cmdFinalizarLigacaoCaiu" class="cmdFinalizarLigacaoCaiu" src="../App_Themes/icone/erase.gif" title="Finalizar ligação caiu" onclick="finalizarLigacaoCaiu();"/>
+                        </div>
+                        <div>
+                            <img alt="Gerar PassCode" id="cmdGerarPassCode" src="../App_Themes/icone/usuario-16x16.png" title="Gerar PassCode" class="cmdGerarPassCode" onclick="gerarPassCode();"/>
+                        </div>
+                    </div>
+                    <div class="divBarraFerramenta2">
+                        <div id="divcmdPesquisar">
+                            <input type="image" name="cmdPesquisar" id="cmdPesquisar" title="Pesquisar cliente." src="../App_Themes/icone/find4.gif" onclick="return validarPesquisa();"/>
+                        </div>
+                        <div id="divimgIncluir">
+                            <img src="../App_Themes/icone/ok.gif" id="imgIncluir" title="Incluir novo cliente." onclick="exibirInclusaoCliente();"/>
+                        </div>
+                        <div id="divimgDetalheCliente">
+                            <img src="../App_Themes/icone/Panel-Setting-16x16.png" id="imgDetalheCliente" title="Exibir detalhes do cliente." onclick="exibirDetalheCliente();"/>
+                        </div>
+                        <div id="divcmdPesquisaAvancada"></div>
+                        <div id="divcmdEmpresaPesquisa"></div>
+                        <div id="divimgAlterar">
+                            <img src="../App_Themes/icone/save.gif" id="imgAlterar" title="Alterar os dados do cliente." onclick="alterarDados();"/>
+                        </div>
+                        <div id="divcmdBuscarRetornoVenda"></div>
+                        <div id="divcmdAcionarCliente"></div>
+                        <div id="divimgEmitirDocumento"></div>
+                        <div id="divimgEnviarDocumento"></div>
+                        <div id="divimgQuestionario">
+                            <img alt="" src="../App_Themes/icone/help-16x16.png" title="Questionário." onclick="exibirQuestionario();" id="imgQuestionario"/>
+                        </div>
+                        <div id="divimgExcluir"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="divPai">
+                <div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;"></div>
+                    <div style="width: 90%;"></div>
+                </div>
+                <div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblCedente">cedente</span>
+                    </div>
+                    <div style="width: 90%;">
+                        <input name="txtCedente" type="text" readonly="readonly" id="txtCedente"/>
+                    </div>
+                </div>
+                <div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblNome">nome</span>
+                    </div>
+                    <div style="width: 30%;">
+                        <input name="txtNome" type="text" maxlength="50" id="txtNome" accesskey="N" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblCPF">cpf/cnpj</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtCpf" type="text" maxlength="15" id="txtCpf" accesskey="F" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblRg">rg</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtRg" type="text" maxlength="14" id="txtRg" accesskey="R" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                </div>
+                <div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblDeposito2">depósito</span>
+                    </div>
+                    <div style="width: 30%;">
+                        <input name="txtDeposito2" type="text" id="txtDeposito2"/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblTelefone">telefone</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtTelefone" type="text" maxlength="12" id="txtTelefone" accesskey="T" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblDataNascimento2" title="Data de nascimento.">data nascimento</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtDataNascimento2" type="text" maxlength="10" id="txtDataNascimento2"/>
+                    </div>
+                </div>
+                <div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblIdentificador">cliente</span>
+                    </div>
+                    <div style="width: 30%;">
+                        <input name="txtIdentificador" type="text" maxlength="50" id="txtIdentificador" accesskey="C" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblIdCliente" title="cliente easyCollector">cliente ec</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtIdCliente" type="text" maxlength="9" id="txtIdCliente" accesskey="E" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblIdentificadorContrato">contrato</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtIdentificadorContrato" type="text" maxlength="50" id="txtIdentificadorContrato" accesskey="O" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                </div>
+                <div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblFatura">fatura</span>
+                    </div>
+                    <div style="width: 30%;">
+                        <input name="txtFatura" type="text" maxlength="9" id="txtFatura" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblNossoNumero">nosso número</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtNossoNumero" type="text" maxlength="20" id="txtNossoNumero" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblAcordoEc">acordo</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtAcordoEc" type="text" maxlength="9" id="txtAcordoEc" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                </div>
+                <div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblNegativado" title="Informa se o cliente tem negativação.">negativado</span>
+                    </div>
+                    <div style="width: 30%;">
+                        <input name="txtNegativado" type="text" maxlength="50" readonly="readonly" id="txtNegativado" title="Informa se o cliente tem negativação."/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblDi">número di</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtDi" type="text" maxlength="20" id="txtDi" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;"/>
+                    </div>
+                    <div style="width: 10%; min-width: 10%; max-width: 10%; text-align: right; font-family: 'Courier New' , Courier, monospace; font-size: small; color: #000099;">
+                        <span id="lblEmail">eMail</span>
+                    </div>
+                    <div style="width: 20%;">
+                        <input name="txtEmail" type="text" maxlength="2000" id="txtEmail" onClick="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" onKeyDown="javascript:document.getElementById(&#39;txtCampoPesquisa&#39;).value = this.id;" style="width: calc(100% - 26px);"/>
+                        <img src="../App_Themes/icone/email.gif" id="imgEmail" title="Exibir e-mails do cliente." onclick="exibirEmailsCliente();" style="width: 16px; height: 16px; vertical-align: middle; cursor: pointer;"/>
+                    </div>
+                </div>
+                <div>
+                    <div style="color: #ff0000; font-family: Verdana, Geneva, Tahoma, sans-serif; font-size: smaller;">
+                        <span id="lblMensagem"></span>
+                        <input name="txtMsg" type="text" readonly="readonly" id="txtMsg" style="font-family: Verdana; font-size: 11px; text-align: left; color: Red; text-transform: uppercase; border-width: 0;"/>
+                    </div>
+                </div>
+            </div>
+            <div class="divCliente" id="divCliente" style="visibility: hidden; display: none;">
+                <div id="divControleOculto" class="divControleOculto" style="visibility: hidden; display: none;">
+                    <input name="txtCampoPesquisa" type="text" id="txtCampoPesquisa"/>
+                    <input name="txtIdClientePesquisado" type="text" id="txtIdClientePesquisado"/>
+                    <input name="txtTipoAgenda" type="text" id="txtTipoAgenda"/>
+                    <input name="txtAtualizarEndereco" type="text" id="txtAtualizarEndereco"/>
+                    <input name="txtQuestionario" type="text" id="txtQuestionario"/>
+                    <input name="txtPermissaoCampo" type="text" value="True|True|True|True|True|True|True|True|True|True|True|True|True" id="txtPermissaoCampo"/>
+                    <input name="txtPopUp" type="text" id="txtPopUp"/>
+                    <input name="txtTempoParaTabular" type="text" id="txtTempoParaTabular"/>
+                    <input name="txtAtualizarTelefone" type="text" id="txtAtualizarTelefone"/>
+                    <input name="txtTabulacaoManualOlos" type="text" id="txtTabulacaoManualOlos"/>
+                    <input name="txtBloquearTabulacaoManualOlos" type="text" value="N" id="txtBloquearTabulacaoManualOlos"/>
+                    <input type="hidden" name="hdfMensagemBloqueio" id="hdfMensagemBloqueio"/>
+                    <input type="hidden" name="hdfAcordoAVencer" id="hdfAcordoAVencer"/>
+                    <input type="hidden" name="hdfAcordoVencido" id="hdfAcordoVencido"/>
+                </div>
+            </div>
+        </form>
+        <script type="text/javascript" src="../script/geral/mozemul.js?versaoAPPSite=20250114142532"></script>
+        <script type="text/javascript" src="../script/geral/BlockPage.js?versaoAPPSite=20250114142532"></script>
+        <script type="text/javascript" src="../script/geral/funcoes.js?versaoAPPSite=20250114142532"></script>
+        <script type="text/javascript" src="../script/operacao/cliente.js?versaoAPPSite=20250114142532"></script>
+    </body>
+</html>
