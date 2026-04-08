@@ -1,0 +1,50 @@
+@baseUrl = http://localhost
+@funcionarioId = 1
+
+###
+# Criacao de funcionario - payload valido
+POST {{baseUrl}}/api/funcionarios
+Content-Type: application/json
+
+{
+  "nome": "Ana Paula Ribeiro",
+  "cpf": "12345678901",
+  "email": "ana.ribeiro@nexusrh.local",
+  "senha": "Senha@123",
+  "perfilAcesso": "Usuario",
+  "cargoId": 1,
+  "centroCustoId": 1,
+  "supervisorId": null,
+  "salarioAtual": "4500.00",
+  "dataAdmissao": "2026-04-01",
+  "status": "Ativo"
+}
+
+###
+# Busca de funcionario por ID
+GET {{baseUrl}}/api/funcionarios/{{funcionarioId}}
+Content-Type: application/json
+
+###
+# Listagem geral de funcionarios
+GET {{baseUrl}}/api/funcionarios
+Content-Type: application/json
+
+###
+# Falha de validacao - CPF invalido (retorno esperado: HTTP 400)
+POST {{baseUrl}}/api/funcionarios
+Content-Type: application/json
+
+{
+  "nome": "Funcionario CPF Invalido",
+  "cpf": "12345",
+  "email": "cpf.invalido@nexusrh.local",
+  "senha": "Senha@123",
+  "perfilAcesso": "Usuario",
+  "cargoId": 1,
+  "centroCustoId": 1,
+  "supervisorId": null,
+  "salarioAtual": "3200.00",
+  "dataAdmissao": "2026-04-05",
+  "status": "Ativo"
+}

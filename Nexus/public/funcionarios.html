@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus RH | Funcionarios ADM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row g-0">
+            <aside class="col-12 col-lg-3 col-xl-2 sidebar-shell sidebar-sticky p-3 p-md-4">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-building fs-4 text-white"></i>
+                    <span class="sidebar-logo fs-4">Nexus RH</span>
+                </div>
+                <p class="sidebar-caption mb-4">Painel Administrativo</p>
+
+                <nav class="nav flex-column sidebar-nav">
+                    <a class="nav-link" href="./index.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+                    <a class="nav-link active" href="./funcionarios.html"><i
+                            class="bi bi-people me-2"></i>Funcionarios</a>
+                    <a class="nav-link" href="./bater-ponto.html"><i class="bi bi-clock-history me-2"></i>Bater
+                        Ponto</a>
+                    <a class="nav-link" href="./holerites.html"><i class="bi bi-receipt me-2"></i>Holerites</a>
+                </nav>
+            </aside>
+
+            <main class="col-12 col-lg-9 col-xl-10 bg-light main-shell p-4 p-md-5">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="./index.html">Inicio</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Funcionarios</li>
+                    </ol>
+                </nav>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h3 mb-0">Lista de Funcionarios</h2>
+                    <button class="btn btn-primary shadow-sm"><i class="bi bi-person-plus-fill me-2"></i>Novo
+                        Funcionario</button>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped align-middle table-corporate mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Cargo</th>
+                                        <th>Centro de Custo</th>
+                                        <th>CPF</th>
+                                        <th>Admissao</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Acoes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Carlos Silva</td>
+                                        <td>Desenvolvedor Senior</td>
+                                        <td>Tecnologia</td>
+                                        <td>123.456.789-01</td>
+                                        <td>15/01/2023</td>
+                                        <td><span class="badge text-bg-success">Ativo</span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-primary me-1"><i
+                                                    class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ana Beatriz Souza</td>
+                                        <td>Analista de RH</td>
+                                        <td>Recursos Humanos</td>
+                                        <td>223.456.789-02</td>
+                                        <td>04/03/2022</td>
+                                        <td><span class="badge text-bg-success">Ativo</span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-primary me-1"><i
+                                                    class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Mariana Oliveira</td>
+                                        <td>Gerente de TI</td>
+                                        <td>Tecnologia</td>
+                                        <td>323.456.789-03</td>
+                                        <td>10/08/2021</td>
+                                        <td><span class="badge text-bg-success">Ativo</span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-primary me-1"><i
+                                                    class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Ricardo Mendes</td>
+                                        <td>Diretor</td>
+                                        <td>Diretoria</td>
+                                        <td>423.456.789-04</td>
+                                        <td>21/11/2020</td>
+                                        <td><span class="badge text-bg-success">Ativo</span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-primary me-1"><i
+                                                    class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Paula Nascimento</td>
+                                        <td>Analista de RH</td>
+                                        <td>Recursos Humanos</td>
+                                        <td>523.456.789-05</td>
+                                        <td>02/05/2024</td>
+                                        <td><span class="badge text-bg-warning">Ferias</span></td>
+                                        <td class="text-end">
+                                            <button class="btn btn-sm btn-outline-primary me-1"><i
+                                                    class="bi bi-pencil"></i></button>
+                                            <button class="btn btn-sm btn-outline-danger"><i
+                                                    class="bi bi-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+</body>
+
+</html>
