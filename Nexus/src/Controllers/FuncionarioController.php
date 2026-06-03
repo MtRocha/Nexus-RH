@@ -8,82 +8,65 @@ use NexusRH\Exceptions\BusinessRuleException;
 use NexusRH\Exceptions\ValidationException;
 use NexusRH\Models\DTO\FuncionarioDTO;
 use NexusRH\Services\FuncionarioService;
+use NexusRH\Support\JsonResponse;
 use Throwable;
 
 final class FuncionarioController
 {
+    private FuncionarioService $funcionarioService;
+
     public function __construct(
-        private readonly FuncionarioService $funcionarioService = new FuncionarioService()
     ) {
+        $this->funcionarioService = new FuncionarioService();
     }
 
     public function handleRequest(string $method, ?int $funcionarioId = null): void
     {
-        header('Content-Type: application/json');
-
         try {
             if ($method === 'POST') {
                 $payload = $this->readJsonPayload();
                 $funcionario = $this->buildFuncionarioDTO($payload);
                 $novoId = $this->funcionarioService->criar($funcionario);
 
-                http_response_code(201);
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'Funcionario criado com sucesso.',
-                    'data' => ['FuncionarioID' => $novoId],
-                ]);
+                JsonResponse::success(['FuncionarioID' => $novoId], 'Funcionario criado com sucesso.', 201);
                 return;
             }
 
             if ($method === 'GET') {
+                if (isset($_GET['catalogos']) && $_GET['catalogos'] === '1') {
+                    JsonResponse::success($this->funcionarioService->catalogos());
+                    return;
+                }
+
                 if ($funcionarioId === null) {
                     $funcionarios = $this->funcionarioService->listarTodos();
 
-                    http_response_code(200);
-                    echo json_encode([
-                        'success' => true,
-                        'data' => $funcionarios,
-                    ]);
+                    JsonResponse::success($funcionarios);
                     return;
                 }
 
                 $funcionario = $this->funcionarioService->buscarPorId($funcionarioId);
 
                 if ($funcionario === null) {
-                    http_response_code(404);
-                    echo json_encode([
-                        'success' => false,
-                        'message' => 'Funcionario nao encontrado.',
-                    ]);
+                    JsonResponse::error('Funcionario nao encontrado.', 404);
                     return;
                 }
 
-                http_response_code(200);
-                echo json_encode([
-                    'success' => true,
-                    'data' => $funcionario,
-                ]);
+                JsonResponse::success($funcionario);
                 return;
             }
 
-            http_response_code(405);
-            echo json_encode([
-                'success' => false,
-                'message' => 'Metodo HTTP nao suportado para este endpoint.',
-            ]);
+            if ($method === 'DELETE' && $funcionarioId !== null) {
+                $this->funcionarioService->desativar($funcionarioId);
+                JsonResponse::success(null, 'Funcionario desativado com sucesso.');
+                return;
+            }
+
+            JsonResponse::error('Metodo HTTP nao suportado para este endpoint.', 405);
         } catch (ValidationException | BusinessRuleException $exception) {
-            http_response_code(400);
-            echo json_encode([
-                'success' => false,
-                'message' => $exception->getMessage(),
-            ]);
+            JsonResponse::error($exception->getMessage(), 400);
         } catch (Throwable $exception) {
-            http_response_code(500);
-            echo json_encode([
-                'success' => false,
-                'message' => 'Erro interno no servidor.',
-            ]);
+            JsonResponse::error('Erro interno no servidor.', 500);
         }
     }
 

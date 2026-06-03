@@ -135,6 +135,10 @@ IF OBJECT_ID('dbo.LogTransferenciaHierarquia', 'U') IS NOT NULL DROP TABLE dbo.L
 IF OBJECT_ID('dbo.LogDesligamento', 'U') IS NOT NULL DROP TABLE dbo.LogDesligamento;
 IF OBJECT_ID('dbo.LogAlteracaoSalarial', 'U') IS NOT NULL DROP TABLE dbo.LogAlteracaoSalarial;
 IF OBJECT_ID('dbo.LogStatusPagamento', 'U') IS NOT NULL DROP TABLE dbo.LogStatusPagamento;
+IF OBJECT_ID('dbo.ConsumoApiLog', 'U') IS NOT NULL DROP TABLE dbo.ConsumoApiLog;
+IF OBJECT_ID('dbo.LogOperacaoSistema', 'U') IS NOT NULL DROP TABLE dbo.LogOperacaoSistema;
+IF OBJECT_ID('dbo.ConfiguracaoSistema', 'U') IS NOT NULL DROP TABLE dbo.ConfiguracaoSistema;
+IF OBJECT_ID('dbo.FuncionarioMfa', 'U') IS NOT NULL DROP TABLE dbo.FuncionarioMfa;
 GO
 
 CREATE TABLE dbo.LogTransferenciaCentroCusto (
@@ -211,6 +215,67 @@ CREATE TABLE dbo.LogStatusPagamento (
 );
 GO
 
+CREATE TABLE dbo.ConfiguracaoSistema (
+    ConfiguracaoID INT IDENTITY(1,1) NOT NULL,
+    Chave VARCHAR(80) NOT NULL,
+    Valor VARCHAR(500) NOT NULL,
+    Categoria VARCHAR(50) NOT NULL CONSTRAINT DF_ConfiguracaoSistema_Categoria DEFAULT ('Geral'),
+    Descricao VARCHAR(255) NULL,
+    TipoCampo VARCHAR(30) NOT NULL CONSTRAINT DF_ConfiguracaoSistema_TipoCampo DEFAULT ('texto'),
+    Editavel BIT NOT NULL CONSTRAINT DF_ConfiguracaoSistema_Editavel DEFAULT (1),
+    Ativo BIT NOT NULL CONSTRAINT DF_ConfiguracaoSistema_Ativo DEFAULT (1),
+    AtualizadoEm DATETIME2 NOT NULL CONSTRAINT DF_ConfiguracaoSistema_AtualizadoEm DEFAULT (GETDATE()),
+    CONSTRAINT PK_ConfiguracaoSistema PRIMARY KEY (ConfiguracaoID),
+    CONSTRAINT UQ_ConfiguracaoSistema_Chave UNIQUE (Chave)
+);
+GO
+
+CREATE TABLE dbo.FuncionarioMfa (
+    FuncionarioMfaID INT IDENTITY(1,1) NOT NULL,
+    FuncionarioID INT NOT NULL,
+    SecretBase32 VARCHAR(128) NOT NULL,
+    Provedor VARCHAR(30) NOT NULL CONSTRAINT DF_FuncionarioMfa_Provedor DEFAULT ('TOTP'),
+    Ativo BIT NOT NULL CONSTRAINT DF_FuncionarioMfa_Ativo DEFAULT (1),
+    CriadoEm DATETIME2 NOT NULL CONSTRAINT DF_FuncionarioMfa_CriadoEm DEFAULT (GETDATE()),
+    UltimoUsoEm DATETIME2 NULL,
+    CONSTRAINT PK_FuncionarioMfa PRIMARY KEY (FuncionarioMfaID),
+    CONSTRAINT UQ_FuncionarioMfa_Funcionario UNIQUE (FuncionarioID),
+    CONSTRAINT FK_FuncionarioMfa_Funcionario FOREIGN KEY (FuncionarioID) REFERENCES dbo.Funcionario (FuncionarioID)
+);
+GO
+
+CREATE TABLE dbo.LogOperacaoSistema (
+    LogOperacaoID INT IDENTITY(1,1) NOT NULL,
+    TipoOperacao VARCHAR(50) NOT NULL,
+    Entidade VARCHAR(80) NULL,
+    EntidadeID VARCHAR(50) NULL,
+    FuncionarioID INT NULL,
+    Sucesso BIT NOT NULL,
+    Mensagem VARCHAR(255) NOT NULL,
+    DetalhesJson NVARCHAR(MAX) NULL,
+    IpOrigem VARCHAR(60) NULL,
+    UserAgent VARCHAR(255) NULL,
+    DataOperacao DATETIME2 NOT NULL CONSTRAINT DF_LogOperacaoSistema_DataOperacao DEFAULT (GETDATE()),
+    CONSTRAINT PK_LogOperacaoSistema PRIMARY KEY (LogOperacaoID),
+    CONSTRAINT FK_LogOperacaoSistema_Funcionario FOREIGN KEY (FuncionarioID) REFERENCES dbo.Funcionario (FuncionarioID)
+);
+GO
+
+CREATE TABLE dbo.ConsumoApiLog (
+    ConsumoApiLogID INT IDENTITY(1,1) NOT NULL,
+    Endpoint VARCHAR(180) NOT NULL,
+    Metodo VARCHAR(10) NOT NULL,
+    StatusHttp SMALLINT NOT NULL,
+    FuncionarioID INT NULL,
+    TempoRespostaMs INT NULL,
+    IpOrigem VARCHAR(60) NULL,
+    UserAgent VARCHAR(255) NULL,
+    DataConsumo DATETIME2 NOT NULL CONSTRAINT DF_ConsumoApiLog_DataConsumo DEFAULT (GETDATE()),
+    CONSTRAINT PK_ConsumoApiLog PRIMARY KEY (ConsumoApiLogID),
+    CONSTRAINT FK_ConsumoApiLog_Funcionario FOREIGN KEY (FuncionarioID) REFERENCES dbo.Funcionario (FuncionarioID)
+);
+GO
+
 -- Indices uteis para consultas frequentes
 CREATE INDEX IX_Funcionario_CargoID ON dbo.Funcionario (CargoID);
 CREATE INDEX IX_Funcionario_CentroCustoID ON dbo.Funcionario (CentroCustoID);
@@ -219,4 +284,7 @@ CREATE INDEX IX_RegistroPonto_FuncionarioID ON dbo.RegistroPonto (FuncionarioID)
 CREATE INDEX IX_SolicitacaoFerias_FuncionarioID ON dbo.SolicitacaoFerias (FuncionarioID);
 CREATE INDEX IX_AfastamentoAtestado_FuncionarioID ON dbo.AfastamentoAtestado (FuncionarioID);
 CREATE INDEX IX_FolhaPagamento_FuncionarioID ON dbo.FolhaPagamento (FuncionarioID);
+CREATE INDEX IX_LogOperacaoSistema_DataOperacao ON dbo.LogOperacaoSistema (DataOperacao DESC);
+CREATE INDEX IX_ConsumoApiLog_DataConsumo ON dbo.ConsumoApiLog (DataConsumo DESC);
+CREATE INDEX IX_ConfiguracaoSistema_Categoria ON dbo.ConfiguracaoSistema (Categoria);
 GO

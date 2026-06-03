@@ -11,9 +11,11 @@ use NexusRH\Models\DTO\FuncionarioDTO;
 
 final class FuncionarioService
 {
+    private FuncionarioDAO $funcionarioDAO;
+
     public function __construct(
-        private readonly FuncionarioDAO $funcionarioDAO = new FuncionarioDAO()
     ) {
+        $this->funcionarioDAO = new FuncionarioDAO();
     }
 
     public function criar(FuncionarioDTO $funcionario): int
@@ -38,6 +40,27 @@ final class FuncionarioService
     public function listarTodos(): array
     {
         return $this->funcionarioDAO->buscarTodos();
+    }
+
+    public function catalogos(): array
+    {
+        return [
+            'cargos' => $this->funcionarioDAO->listarCargos(),
+            'centrosCusto' => $this->funcionarioDAO->listarCentrosCusto(),
+        ];
+    }
+
+    public function desativar(int $funcionarioId): void
+    {
+        if ($funcionarioId <= 0) {
+            throw new ValidationException('FuncionarioID invalido. Informe um valor inteiro positivo.');
+        }
+
+        if (!$this->funcionarioDAO->existeFuncionarioPorId($funcionarioId)) {
+            throw new BusinessRuleException('Funcionario nao encontrado.');
+        }
+
+        $this->funcionarioDAO->desativar($funcionarioId);
     }
 
     private function validarDadosObrigatorios(FuncionarioDTO $funcionario): void

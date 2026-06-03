@@ -135,6 +135,20 @@ final class FuncionarioDAO extends BaseDAO
         return $data !== false ? $data : null;
     }
 
+    public function desativar(int $funcionarioId): void
+    {
+        $sql = <<<SQL
+            UPDATE Funcionario
+            SET Status = 'Desligado',
+                DataDesligamento = COALESCE(DataDesligamento, CAST(GETDATE() AS DATE))
+            WHERE FuncionarioID = :FuncionarioID;
+        SQL;
+
+        $statement = $this->connection->prepare($sql);
+        $statement->bindValue(':FuncionarioID', $funcionarioId, PDO::PARAM_INT);
+        $statement->execute();
+    }
+
     public function buscarTodos(): array
     {
         $sql = <<<SQL
@@ -163,6 +177,22 @@ final class FuncionarioDAO extends BaseDAO
         SQL;
 
         $statement = $this->connection->prepare($sql);
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
+    public function listarCargos(): array
+    {
+        $statement = $this->connection->prepare('SELECT CargoID, Nome, NivelHierarquico FROM Cargo ORDER BY Nome ASC;');
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
+
+    public function listarCentrosCusto(): array
+    {
+        $statement = $this->connection->prepare('SELECT CentroCustoID, Codigo, Nome FROM CentroCusto ORDER BY Nome ASC;');
         $statement->execute();
 
         return $statement->fetchAll();

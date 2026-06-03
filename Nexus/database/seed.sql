@@ -162,6 +162,39 @@ BEGIN TRY
             'Ativo'
         );
 
+    -- 4) Configuracoes iniciais do sistema
+    IF NOT EXISTS (SELECT 1 FROM dbo.ConfiguracaoSistema WHERE Chave = 'empresa.nome')
+        INSERT INTO dbo.ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo)
+        VALUES ('empresa.nome', 'Nexus RH', 'Geral', 'Nome exibido no sistema', 'texto', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.ConfiguracaoSistema WHERE Chave = 'empresa.slogan')
+        INSERT INTO dbo.ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo)
+        VALUES ('empresa.slogan', 'Gestao de RH, jornadas e compliance em um unico painel.', 'Geral', 'Texto institucional', 'texto', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.ConfiguracaoSistema WHERE Chave = 'mapa.latitude')
+        INSERT INTO dbo.ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo)
+        VALUES ('mapa.latitude', '-23.5629', 'Mapa', 'Latitude do ponto principal', 'numero', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.ConfiguracaoSistema WHERE Chave = 'mapa.longitude')
+        INSERT INTO dbo.ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo)
+        VALUES ('mapa.longitude', '-46.6560', 'Mapa', 'Longitude do ponto principal', 'numero', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.ConfiguracaoSistema WHERE Chave = 'mapa.zoom')
+        INSERT INTO dbo.ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo)
+        VALUES ('mapa.zoom', '15', 'Mapa', 'Nivel de zoom do mapa', 'numero', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.ConfiguracaoSistema WHERE Chave = 'mfa.obrigatorio')
+        INSERT INTO dbo.ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo)
+        VALUES ('mfa.obrigatorio', '0', 'Seguranca', 'Exige MFA no login', 'booleano', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.ConfiguracaoSistema WHERE Chave = 'api.publica.habilitada')
+        INSERT INTO dbo.ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo)
+        VALUES ('api.publica.habilitada', '1', 'Integracao', 'Disponibiliza consultas por API', 'booleano', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.ConfiguracaoSistema WHERE Chave = 'dashboard.atualizacao_segundos')
+        INSERT INTO dbo.ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo)
+        VALUES ('dashboard.atualizacao_segundos', '60', 'Dashboard', 'Intervalo padrao de atualizacao', 'numero', 1, 1);
+
     COMMIT TRANSACTION;
 END TRY
 BEGIN CATCH

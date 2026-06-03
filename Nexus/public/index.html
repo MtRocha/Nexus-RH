@@ -1,95 +1,65 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus RH | Dashboard ADM</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus RH | Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="./style.css">
 </head>
-
-<body>
-    <div class="container-fluid">
-        <div class="row g-0">
-            <aside class="col-12 col-lg-3 col-xl-2 sidebar-shell sidebar-sticky p-3 p-md-4">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bi bi-building fs-4 text-white"></i>
-                    <span class="sidebar-logo fs-4">Nexus RH</span>
-                </div>
-                <p class="sidebar-caption mb-4">Painel Administrativo</p>
-
-                <nav class="nav flex-column sidebar-nav">
-                    <a class="nav-link active" href="./index.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
-                    <a class="nav-link" href="./funcionarios.html"><i class="bi bi-people me-2"></i>Funcionarios</a>
-                    <a class="nav-link" href="./bater-ponto.html"><i class="bi bi-clock-history me-2"></i>Bater
-                        Ponto</a>
-                    <a class="nav-link" href="./holerites.html"><i class="bi bi-receipt me-2"></i>Holerites</a>
-                </nav>
-            </aside>
-
-            <main class="col-12 col-lg-9 col-xl-10 bg-light main-shell p-4 p-md-5">
-                <nav aria-label="breadcrumb" class="mb-4">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
-                    </ol>
-                </nav>
-
-                <div class="row g-3 mb-4">
-                    <div class="col-12 col-md-4">
-                        <div class="card shadow-sm h-100 border-0">
-                            <div class="card-body">
-                                <p class="text-muted mb-1">Total Funcionarios</p>
-                                <h3 class="mb-1">186</h3>
-                                <span class="badge text-bg-success">+12 no trimestre</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <div class="card shadow-sm h-100 border-0">
-                            <div class="card-body">
-                                <p class="text-muted mb-1">Pontos Registrados Hoje</p>
-                                <h3 class="mb-1">148</h3>
-                                <span class="badge text-bg-primary">Turno matinal em andamento</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-4">
-                        <div class="card shadow-sm h-100 border-0">
-                            <div class="card-body">
-                                <p class="text-muted mb-1">Avisos</p>
-                                <h3 class="mb-1">03</h3>
-                                <span class="badge text-bg-warning">2 ferias pendentes</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <button class="btn btn-primary w-100 quick-action-btn shadow-sm"><i
-                                class="bi bi-person-plus-fill me-2"></i>Adicionar Funcionario</button>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <button class="btn btn-outline-primary w-100 quick-action-btn shadow-sm"><i
-                                class="bi bi-calendar2-check me-2"></i>Aprovar Ferias</button>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <button class="btn btn-outline-primary w-100 quick-action-btn shadow-sm"><i
-                                class="bi bi-currency-dollar me-2"></i>Gerar Folha</button>
-                    </div>
-                    <div class="col-12 col-md-6 col-xl-3">
-                        <button class="btn btn-outline-primary w-100 quick-action-btn shadow-sm"><i
-                                class="bi bi-file-earmark-text me-2"></i>Relatorios</button>
-                    </div>
-                </div>
-            </main>
+<body data-requires-auth="1">
+  <div class="container-fluid">
+    <div class="row g-0">
+      <aside class="col-12 col-lg-3 col-xl-2 sidebar-shell sidebar-sticky p-3 p-md-4">
+        <div class="d-flex align-items-center gap-2 mb-3"><i class="bi bi-building fs-4 text-white"></i><span class="sidebar-logo fs-4">Nexus RH</span></div>
+        <p class="sidebar-caption mb-4">Painel administrativo em nuvem</p>
+        <nav class="nav flex-column sidebar-nav">
+          <a class="nav-link active" href="./index.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+          <a class="nav-link" href="./funcionarios.html"><i class="bi bi-people me-2"></i>Funcionários</a>
+          <a class="nav-link" href="./bater-ponto.html"><i class="bi bi-geo-alt me-2"></i>Mapa / Ponto</a>
+          <a class="nav-link" href="./holerites.html"><i class="bi bi-receipt me-2"></i>Holerites</a>
+          <a class="nav-link" href="./configuracoes.html"><i class="bi bi-gear me-2"></i>Configurações</a>
+          <a class="nav-link" href="./logs.html"><i class="bi bi-journal-text me-2"></i>Logs</a>
+        </nav>
+        <div class="mt-4 p-3 rounded-4 user-card">
+          <div id="current-user-name" class="fw-semibold text-white">Carregando...</div>
+          <div id="current-user-profile" class="small text-white-50">-</div>
+          <button type="button" class="btn btn-sm btn-outline-light mt-3 w-100" data-action="logout">Sair</button>
         </div>
+      </aside>
+      <main class="col-12 col-lg-9 col-xl-10 main-shell p-4 p-xl-5">
+        <div class="hero-panel mb-4 p-4 p-xl-5 rounded-5 text-white shadow-sm">
+          <div class="d-flex flex-column flex-xl-row justify-content-between align-items-xl-end gap-4">
+            <div>
+              <div class="text-uppercase small mb-2 opacity-75">Dashboard operacional</div>
+              <h1 id="dashboard-company-title" class="display-6 fw-bold mb-2">Nexus RH</h1>
+              <p id="dashboard-company-subtitle" class="mb-0 text-white-75">Gestão inteligente de RH</p>
+            </div>
+            <div class="text-xl-end"><div class="small text-white-50">Disponível por API, logs, MFA e gestão configurável.</div></div>
+          </div>
+        </div>
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-xl-2"><div class="metric-card h-100"><div class="metric-label">Funcionários</div><div id="dashboard-total-funcionarios" class="metric-value">0</div></div></div>
+          <div class="col-6 col-xl-2"><div class="metric-card h-100"><div class="metric-label">Ativos</div><div id="dashboard-funcionarios-ativos" class="metric-value">0</div></div></div>
+          <div class="col-6 col-xl-2"><div class="metric-card h-100"><div class="metric-label">Pontos hoje</div><div id="dashboard-pontos-hoje" class="metric-value">0</div></div></div>
+          <div class="col-6 col-xl-2"><div class="metric-card h-100"><div class="metric-label">Férias pendentes</div><div id="dashboard-ferias-pendentes" class="metric-value">0</div></div></div>
+          <div class="col-6 col-xl-2"><div class="metric-card h-100"><div class="metric-label">Operações / 7 dias</div><div id="dashboard-operacoes-semana" class="metric-value">0</div></div></div>
+          <div class="col-6 col-xl-2"><div class="metric-card h-100"><div class="metric-label">Chamadas API / 7 dias</div><div id="dashboard-api-semana" class="metric-value">0</div></div></div>
+        </div>
+        <div class="row g-4 mb-4">
+          <div class="col-12 col-xl-7"><div class="card panel-card h-100 shadow-sm border-0"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 mb-0">Funcionários por cargo</h2><span class="badge text-bg-light text-dark">Chart.js</span></div><canvas id="dashboard-chart-cargos" height="140"></canvas></div></div></div>
+          <div class="col-12 col-xl-5"><div class="card panel-card h-100 shadow-sm border-0"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 mb-0">Centro de custo</h2><span class="badge text-bg-light text-dark">Dashboard</span></div><canvas id="dashboard-chart-centros" height="140"></canvas></div></div></div>
+        </div>
+        <div class="row g-4">
+          <div class="col-12 col-xl-7"><div class="card panel-card shadow-sm border-0 h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 mb-0">Atividade recente</h2><span class="badge text-bg-light text-dark">Logs</span></div><div id="dashboard-last-logs" class="list-group list-group-flush"></div></div></div></div>
+          <div class="col-12 col-xl-5"><div class="card panel-card shadow-sm border-0 h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 mb-0">Atalho de gestão</h2><span class="badge text-bg-light text-dark">Interface</span></div><div class="d-grid gap-2"><a class="btn btn-primary" href="./funcionarios.html"><i class="bi bi-people me-2"></i>Gerenciar funcionários</a><a class="btn btn-outline-primary" href="./configuracoes.html"><i class="bi bi-gear me-2"></i>Ajustar configurações</a><a class="btn btn-outline-primary" href="./logs.html"><i class="bi bi-journal-text me-2"></i>Ver logs</a><a class="btn btn-outline-primary" href="./bater-ponto.html"><i class="bi bi-geo-alt me-2"></i>Mapa de ponto</a></div></div></div></div>
+        </div>
+      </main>
     </div>
-
+  </div>
+  <script defer src="./app.js"></script>
 </body>
-
 </html>

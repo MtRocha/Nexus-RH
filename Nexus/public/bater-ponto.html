@@ -1,96 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus RH | Bater Ponto</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus RH | Mapa e Ponto</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="./style.css">
 </head>
-
-<body>
-    <div class="container-fluid">
-        <div class="row g-0">
-            <aside class="col-12 col-lg-3 col-xl-2 sidebar-shell sidebar-sticky p-3 p-md-4">
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bi bi-building fs-4 text-white"></i>
-                    <span class="sidebar-logo fs-4">Nexus RH</span>
-                </div>
-                <p class="sidebar-caption mb-4">Modulo Colaborador</p>
-
-                <nav class="nav flex-column sidebar-nav">
-                    <a class="nav-link" href="./index.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
-                    <a class="nav-link" href="./funcionarios.html"><i class="bi bi-people me-2"></i>Funcionarios</a>
-                    <a class="nav-link active" href="./bater-ponto.html"><i class="bi bi-clock-history me-2"></i>Bater
-                        Ponto</a>
-                    <a class="nav-link" href="./holerites.html"><i class="bi bi-receipt me-2"></i>Holerites</a>
-                </nav>
-            </aside>
-
-            <main class="col-12 col-lg-9 col-xl-10 bg-light main-shell p-4 p-md-5">
-                <nav aria-label="breadcrumb" class="mb-4">
-                    <ol class="breadcrumb mb-0">
-                        <li class="breadcrumb-item"><a href="./index.html">Inicio</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Bater Ponto</li>
-                    </ol>
-                </nav>
-
-                <div class="row g-4 justify-content-center align-items-center">
-                    <div class="col-12 col-md-6 text-center">
-                        <h2 class="h3 mb-3">Registro de Jornada</h2>
-                        <p class="text-muted mb-3">Quarta-feira, 08 de Abril de 2026</p>
-                        <div class="display-1 clock-display mb-4">08:17:42</div>
-                        <button class="point-circle">
-                            <i class="bi bi-fingerprint d-block fs-1"></i>
-                            Registrar Ponto
-                        </button>
-                    </div>
-
-                    <div class="col-12 col-md-4">
-                        <div class="card shadow-sm border-0 mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title mb-3">Batidas do Dia</h5>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item d-flex justify-content-between px-0">
-                                        <span>07:45</span>
-                                        <span class="fw-semibold text-success">Entrada</span>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between px-0">
-                                        <span>12:03</span>
-                                        <span class="fw-semibold text-secondary">Saida Almoco</span>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between px-0">
-                                        <span>13:05</span>
-                                        <span class="fw-semibold text-primary">Retorno</span>
-                                    </li>
-                                    <li class="list-group-item d-flex justify-content-between px-0">
-                                        <span>17:32</span>
-                                        <span class="fw-semibold text-danger">Saida</span>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="card shadow-sm border-0">
-                            <div class="card-body">
-                                <h5 class="card-title mb-2">Local de Registro</h5>
-                                <p class="text-muted small mb-3">Av. Paulista, 1578 - Bela Vista, Sao Paulo</p>
-                                <div class="map-frame rounded overflow-hidden border">
-                                    <iframe title="Mapa do local de registro" class="w-100 h-100"
-                                        src="https://www.openstreetmap.org/export/embed.html?bbox=-46.6649%2C-23.5689%2C-46.6499%2C-23.5569&layer=mapnik&marker=-23.5629%2C-46.6560"
-                                        loading="lazy"></iframe>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
-
+<body data-requires-auth="1">
+  <div class="container-fluid"><div class="row g-0">
+    <aside class="col-12 col-lg-3 col-xl-2 sidebar-shell sidebar-sticky p-3 p-md-4"><div class="d-flex align-items-center gap-2 mb-3"><i class="bi bi-building fs-4 text-white"></i><span class="sidebar-logo fs-4">Nexus RH</span></div><p class="sidebar-caption mb-4">Jornada e geolocalização</p><nav class="nav flex-column sidebar-nav"><a class="nav-link" href="./index.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a><a class="nav-link" href="./funcionarios.html"><i class="bi bi-people me-2"></i>Funcionários</a><a class="nav-link active" href="./bater-ponto.html"><i class="bi bi-geo-alt me-2"></i>Mapa / Ponto</a><a class="nav-link" href="./holerites.html"><i class="bi bi-receipt me-2"></i>Holerites</a><a class="nav-link" href="./configuracoes.html"><i class="bi bi-gear me-2"></i>Configurações</a><a class="nav-link" href="./logs.html"><i class="bi bi-journal-text me-2"></i>Logs</a></nav><div class="mt-4 p-3 rounded-4 user-card"><div id="current-user-name" class="fw-semibold text-white">Carregando...</div><div id="current-user-profile" class="small text-white-50">-</div><button type="button" class="btn btn-sm btn-outline-light mt-3 w-100" data-action="logout">Sair</button></div></aside>
+    <main class="col-12 col-lg-9 col-xl-10 main-shell p-4 p-xl-5"><div class="row g-4 align-items-stretch"><div class="col-12 col-xl-6"><div class="card panel-card shadow-sm border-0 h-100"><div class="card-body d-flex flex-column justify-content-center"><div class="text-uppercase small text-muted mb-2">Registro de jornada</div><h1 class="h2 mb-3">Bater ponto</h1><div class="clock-display display-5 mb-3" id="clock-now">00:00:00</div><p id="mapa-info" class="text-muted mb-4">Carregando dados do mapa...</p><button class="btn btn-primary btn-lg" type="button"><i class="bi bi-fingerprint me-2"></i>Registrar ponto</button></div></div></div><div class="col-12 col-xl-6"><div class="card panel-card shadow-sm border-0 h-100"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h2 class="h5 mb-0">Local do ponto</h2><span id="mapa-titulo" class="badge text-bg-light text-dark">Nexus RH</span></div><div id="leaflet-map" class="map-frame rounded-4"></div></div></div></div></div></main>
+  </div></div>
+  <script defer src="./app.js"></script>
+  <script>(function(){const c=document.getElementById('clock-now');const t=()=>{c.textContent=new Date().toLocaleTimeString('pt-BR');};t();setInterval(t,1000);})();</script>
 </body>
-
 </html>
