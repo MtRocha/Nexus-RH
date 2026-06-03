@@ -14,13 +14,13 @@ final class Database
 
     private function __construct()
     {
-        $host = getenv('DB_HOST') ?: 'localhost';
-        $port = getenv('DB_PORT') ?: '1433';
-        $dbName = getenv('DB_NAME') ?: 'NexusRH';
-        $username = getenv('DB_USER') ?: 'sa';
-        $password = getenv('DB_PASS') ?: '';
+        $host = getenv('DB_HOST') ?: 'sql208.infinityfree.com';
+        $port = getenv('DB_PORT') ?: '3306';
+        $dbName = getenv('DB_NAME') ?: 'if0_42083119_XXX';
+        $username = getenv('DB_USER') ?: 'if0_42083119';
+        $password = getenv('DB_PASS') ?: 'rvL5gbHU9TDbFZc';
 
-        $dsn = "sqlsrv:Server={$host},{$port};Database={$dbName};TrustServerCertificate=true";
+        $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4";
 
         try {
             $this->connection = new PDO($dsn, $username, $password, [

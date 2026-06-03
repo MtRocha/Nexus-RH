@@ -11,7 +11,7 @@ final class AutenticacaoDAO extends BaseDAO
     public function buscarFuncionarioPorLogin(string $login): ?array
     {
         $sql = <<<SQL
-            SELECT TOP 1
+            SELECT
                 FuncionarioID,
                 Nome,
                 CPF,
@@ -20,7 +20,8 @@ final class AutenticacaoDAO extends BaseDAO
                 PerfilAcesso,
                 Status
             FROM Funcionario
-            WHERE Email = :Login OR CPF = :Login;
+            WHERE Email = :Login OR CPF = :Login
+            LIMIT 1;
         SQL;
 
         $statement = $this->connection->prepare($sql);
@@ -34,7 +35,7 @@ final class AutenticacaoDAO extends BaseDAO
 
     public function buscarMfaPorFuncionarioId(int $funcionarioId): ?array
     {
-        $statement = $this->connection->prepare('SELECT TOP 1 * FROM FuncionarioMfa WHERE FuncionarioID = :FuncionarioID;');
+        $statement = $this->connection->prepare('SELECT * FROM FuncionarioMfa WHERE FuncionarioID = :FuncionarioID LIMIT 1;');
         $statement->bindValue(':FuncionarioID', $funcionarioId, PDO::PARAM_INT);
         $statement->execute();
 
@@ -65,7 +66,7 @@ final class AutenticacaoDAO extends BaseDAO
 
     public function marcarMfaUsado(int $funcionarioId): void
     {
-        $statement = $this->connection->prepare('UPDATE FuncionarioMfa SET UltimoUsoEm = GETDATE() WHERE FuncionarioID = :FuncionarioID;');
+        $statement = $this->connection->prepare('UPDATE FuncionarioMfa SET UltimoUsoEm = NOW() WHERE FuncionarioID = :FuncionarioID;');
         $statement->bindValue(':FuncionarioID', $funcionarioId, PDO::PARAM_INT);
         $statement->execute();
     }

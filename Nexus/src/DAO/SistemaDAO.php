@@ -20,7 +20,7 @@ final class SistemaDAO extends BaseDAO
 
     public function buscarConfiguracaoPorChave(string $chave): ?array
     {
-        $statement = $this->connection->prepare('SELECT TOP 1 * FROM ConfiguracaoSistema WHERE Chave = :Chave;');
+        $statement = $this->connection->prepare('SELECT * FROM ConfiguracaoSistema WHERE Chave = :Chave LIMIT 1;');
         $statement->bindValue(':Chave', $chave);
         $statement->execute();
 
@@ -35,11 +35,11 @@ final class SistemaDAO extends BaseDAO
 
         if ($existente === null) {
             $statement = $this->connection->prepare(
-                'INSERT INTO ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo) VALUES (:Chave, :Valor, :Categoria, :Descricao, :TipoCampo, :Editavel, :Ativo); SELECT CAST(SCOPE_IDENTITY() AS INT) AS ConfiguracaoID;'
+                'INSERT INTO ConfiguracaoSistema (Chave, Valor, Categoria, Descricao, TipoCampo, Editavel, Ativo) VALUES (:Chave, :Valor, :Categoria, :Descricao, :TipoCampo, :Editavel, :Ativo);'
             );
         } else {
             $statement = $this->connection->prepare(
-                'UPDATE ConfiguracaoSistema SET Valor = :Valor, Categoria = :Categoria, Descricao = :Descricao, TipoCampo = :TipoCampo, Editavel = :Editavel, Ativo = :Ativo, AtualizadoEm = GETDATE() WHERE Chave = :Chave;'
+                'UPDATE ConfiguracaoSistema SET Valor = :Valor, Categoria = :Categoria, Descricao = :Descricao, TipoCampo = :TipoCampo, Editavel = :Editavel, Ativo = :Ativo, AtualizadoEm = NOW() WHERE Chave = :Chave;'
             );
         }
 
@@ -53,9 +53,7 @@ final class SistemaDAO extends BaseDAO
         $statement->execute();
 
         if ($existente === null) {
-            $result = $statement->fetch();
-
-            return (int) ($result['ConfiguracaoID'] ?? 0);
+            return (int) $this->connection->lastInsertId();
         }
 
         return (int) ($existente['ConfiguracaoID'] ?? 0);
@@ -99,7 +97,7 @@ final class SistemaDAO extends BaseDAO
     {
         $limite = max(1, min(500, $limite));
         $statement = $this->connection->query(
-            'SELECT TOP ' . $limite . ' l.LogOperacaoID, l.TipoOperacao, l.Entidade, l.EntidadeID, l.FuncionarioID, f.Nome AS FuncionarioNome, l.Sucesso, l.Mensagem, l.DetalhesJson, l.IpOrigem, l.UserAgent, l.DataOperacao FROM LogOperacaoSistema l LEFT JOIN Funcionario f ON f.FuncionarioID = l.FuncionarioID ORDER BY l.DataOperacao DESC, l.LogOperacaoID DESC;'
+            'SELECT l.LogOperacaoID, l.TipoOperacao, l.Entidade, l.EntidadeID, l.FuncionarioID, f.Nome AS FuncionarioNome, l.Sucesso, l.Mensagem, l.DetalhesJson, l.IpOrigem, l.UserAgent, l.DataOperacao FROM LogOperacaoSistema l LEFT JOIN Funcionario f ON f.FuncionarioID = l.FuncionarioID ORDER BY l.DataOperacao DESC, l.LogOperacaoID DESC LIMIT ' . $limite . ';'
         );
 
         return $statement->fetchAll();
@@ -109,7 +107,7 @@ final class SistemaDAO extends BaseDAO
     {
         $limite = max(1, min(500, $limite));
         $statement = $this->connection->query(
-            'SELECT TOP ' . $limite . ' l.ConsumoApiLogID, l.Endpoint, l.Metodo, l.StatusHttp, l.FuncionarioID, f.Nome AS FuncionarioNome, l.TempoRespostaMs, l.IpOrigem, l.UserAgent, l.DataConsumo FROM ConsumoApiLog l LEFT JOIN Funcionario f ON f.FuncionarioID = l.FuncionarioID ORDER BY l.DataConsumo DESC, l.ConsumoApiLogID DESC;'
+            'SELECT l.ConsumoApiLogID, l.Endpoint, l.Metodo, l.StatusHttp, l.FuncionarioID, f.Nome AS FuncionarioNome, l.TempoRespostaMs, l.IpOrigem, l.UserAgent, l.DataConsumo FROM ConsumoApiLog l LEFT JOIN Funcionario f ON f.FuncionarioID = l.FuncionarioID ORDER BY l.DataConsumo DESC, l.ConsumoApiLogID DESC LIMIT ' . $limite . ';'
         );
 
         return $statement->fetchAll();
@@ -118,7 +116,7 @@ final class SistemaDAO extends BaseDAO
     public function resumoDashboard(): array
     {
         $statement = $this->connection->query(
-            "SELECT (SELECT COUNT(1) FROM Funcionario) AS TotalFuncionarios, (SELECT COUNT(1) FROM Funcionario WHERE Status = 'Ativo') AS FuncionariosAtivos, (SELECT COUNT(1) FROM RegistroPonto WHERE CAST(DataHoraRegistro AS DATE) = CAST(GETDATE() AS DATE)) AS PontosHoje, (SELECT COUNT(1) FROM SolicitacaoFerias WHERE StatusAprovacao = 'Pendente') AS FeriasPendentes, (SELECT COUNT(1) FROM AfastamentoAtestado WHERE StatusAprovacao = 'Pendente') AS AfastamentosPendentes, (SELECT COUNT(1) FROM LogOperacaoSistema WHERE DataOperacao >= DATEADD(DAY, -7, GETDATE())) AS OperacoesUltimos7Dias, (SELECT COUNT(1) FROM ConsumoApiLog WHERE DataConsumo >= DATEADD(DAY, -7, GETDATE())) AS ChamadasApiUltimos7Dias;"
+            "SELECT (SELECT COUNT(1) FROM Funcionario) AS TotalFuncionarios, (SELECT COUNT(1) FROM Funcionario WHERE Status = 'Ativo') AS FuncionariosAtivos, (SELECT COUNT(1) FROM RegistroPonto WHERE DATE(DataHoraRegistro) = CURDATE()) AS PontosHoje, (SELECT COUNT(1) FROM SolicitacaoFerias WHERE StatusAprovacao = 'Pendente') AS FeriasPendentes, (SELECT COUNT(1) FROM AfastamentoAtestado WHERE StatusAprovacao = 'Pendente') AS AfastamentosPendentes, (SELECT COUNT(1) FROM LogOperacaoSistema WHERE DataOperacao >= DATE_SUB(NOW(), INTERVAL 7 DAY)) AS OperacoesUltimos7Dias, (SELECT COUNT(1) FROM ConsumoApiLog WHERE DataConsumo >= DATE_SUB(NOW(), INTERVAL 7 DAY)) AS ChamadasApiUltimos7Dias;"
         );
 
         return $statement->fetch() ?: [];

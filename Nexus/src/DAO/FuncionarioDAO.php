@@ -40,7 +40,6 @@ final class FuncionarioDAO extends BaseDAO
                 :DataDesligamento,
                 :Status
             );
-            SELECT CAST(SCOPE_IDENTITY() AS INT) AS FuncionarioID;
         SQL;
 
         $statement = $this->connection->prepare($sql);
@@ -58,9 +57,7 @@ final class FuncionarioDAO extends BaseDAO
         $statement->bindValue(':Status', $funcionario->Status);
         $statement->execute();
 
-        $result = $statement->fetch();
-
-        return (int) ($result['FuncionarioID'] ?? 0);
+        return (int) $this->connection->lastInsertId();
     }
 
     public function buscarPorId(int $funcionarioId): ?array
@@ -140,7 +137,7 @@ final class FuncionarioDAO extends BaseDAO
         $sql = <<<SQL
             UPDATE Funcionario
             SET Status = 'Desligado',
-                DataDesligamento = COALESCE(DataDesligamento, CAST(GETDATE() AS DATE))
+                DataDesligamento = COALESCE(DataDesligamento, CURDATE())
             WHERE FuncionarioID = :FuncionarioID;
         SQL;
 
