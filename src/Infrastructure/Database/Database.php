@@ -16,7 +16,7 @@ final class Database
     {
         $host = getenv('DB_HOST') ?: 'sql208.infinityfree.com';
         $port = getenv('DB_PORT') ?: '3306';
-        $dbName = getenv('DB_NAME') ?: 'if0_42083119_XXX';
+        $dbName = getenv('DB_NAME') ?: 'if0_42083119_db_nexusrh';
         $username = getenv('DB_USER') ?: 'if0_42083119';
         $password = getenv('DB_PASS') ?: 'rvL5gbHU9TDbFZc';
 
