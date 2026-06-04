@@ -1,0 +1,182 @@
+:root {
+    --bs-primary: #004a8d;
+    --bs-primary-rgb: 0, 74, 141;
+    --nexus-ink: #0f172a;
+    --nexus-panel: rgba(255, 255, 255, 0.92);
+    --nexus-bg: #eef3f9;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(circle at top right, rgba(0, 74, 141, 0.14), transparent 35%),
+        linear-gradient(180deg, #f7fbff 0%, var(--nexus-bg) 100%);
+    color: var(--nexus-ink);
+    overflow-x: hidden;
+}
+
+.sidebar-shell {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 24%),
+        linear-gradient(180deg, #032f58 0%, #004a8d 100%);
+    box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-logo {
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: #ffffff;
+}
+
+.sidebar-caption {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.85rem;
+}
+
+.sidebar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.88);
+    border-radius: 0.75rem;
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+}
+
+.sidebar-nav .nav-link:hover,
+.sidebar-nav .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+}
+
+.main-shell {
+    min-height: 100vh;
+}
+
+.hero-panel {
+    background: linear-gradient(135deg, #063764 0%, #0057a5 50%, #0b7cd8 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-panel::after {
+    content: '';
+    position: absolute;
+    inset: auto -4rem -4rem auto;
+    width: 14rem;
+    height: 14rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.metric-card,
+.panel-card,
+.login-card {
+    background: var(--nexus-panel);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    backdrop-filter: blur(10px);
+}
+
+.metric-card {
+    border-radius: 1.25rem;
+    padding: 1rem;
+    box-shadow: 0 1rem 2rem rgba(15, 23, 42, 0.04);
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.metric-value {
+    font-size: clamp(1.5rem, 3vw, 2.35rem);
+    font-weight: 800;
+    color: #0f172a;
+}
+
+.panel-card {
+    border-radius: 1.5rem;
+}
+
+.user-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.quick-action-btn {
+    min-height: 80px;
+    font-weight: 600;
+}
+
+.table-corporate tbody tr:nth-child(even) {
+    background-color: #f3f7fc;
+}
+
+.clock-display {
+    letter-spacing: 2px;
+    font-weight: 700;
+    color: #004a8d;
+}
+
+.point-circle {
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    border: none;
+    background-color: #004a8d;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.25rem;
+    box-shadow: 0 1rem 2rem rgba(0, 74, 141, 0.25);
+}
+
+.point-circle:hover {
+    background-color: #003c71;
+}
+
+.map-frame {
+    width: 100%;
+    min-height: 320px;
+    background-color: #e9ecef;
+}
+
+.login-shell {
+    background:
+        radial-gradient(circle at top right, rgba(0, 74, 141, 0.18) 0%, rgba(0, 74, 141, 0.02) 35%),
+        linear-gradient(180deg, #f6fbff 0%, #ecf2f8 100%);
+}
+
+.login-shell .row.min-vh-100 {
+    min-height: calc(100vh - 2rem);
+}
+
+.login-brand-panel {
+    background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 32%),
+        linear-gradient(180deg, #003b70 0%, #0057a5 100%);
+}
+
+.code-block {
+    padding: 0.75rem 1rem;
+    border-radius: 0.85rem;
+    background: #0f172a;
+    color: #e2e8f0;
+    word-break: break-word;
+    font-size: 0.85rem;
+}
+
+.code-input {
+    letter-spacing: 0.35em;
+    font-weight: 700;
+}
+
+@media (min-width: 992px) {
+    .sidebar-sticky {
+        position: sticky;
+        top: 0;
+    }
+}

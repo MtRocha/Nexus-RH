@@ -20,12 +20,13 @@ final class AutenticacaoDAO extends BaseDAO
                 PerfilAcesso,
                 Status
             FROM Funcionario
-            WHERE Email = :Login OR CPF = :Login
+            WHERE Email = :LoginEmail OR CPF = :LoginCpf
             LIMIT 1;
         SQL;
 
         $statement = $this->connection->prepare($sql);
-        $statement->bindValue(':Login', $login);
+        $statement->bindValue(':LoginEmail', $login);
+        $statement->bindValue(':LoginCpf', $login);
         $statement->execute();
 
         $data = $statement->fetch();

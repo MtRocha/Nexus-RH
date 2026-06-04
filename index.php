@@ -5,6 +5,7 @@ declare(strict_types=1);
 use NexusRH\Controllers\FuncionarioController;
 use NexusRH\Controllers\AuthController;
 use NexusRH\Controllers\SistemaController;
+use NexusRH\Controllers\HoleriteController;
 use NexusRH\Services\SistemaService;
 use NexusRH\Support\SessionAuth;
 
@@ -122,6 +123,19 @@ if ($normalizedPath === '/api/configuracoes' && $method === 'POST') {
 if ($normalizedPath === '/api/logs' && $method === 'GET') {
     $dispatch(static function (): void {
         (new SistemaController())->handleRequest('GET', 'logs');
+    });
+}
+
+if ($normalizedPath === '/api/holerites' && $method === 'GET') {
+    $dispatch(static function (): void {
+        (new HoleriteController())->handleRequest('GET', 'list');
+    });
+}
+
+if (preg_match('#^/api/holerites/(\d+)/pdf$#', $normalizedPath, $matches) === 1 && $method === 'GET') {
+    $holeriteId = (int) $matches[1];
+    $dispatch(static function () use ($holeriteId): void {
+        (new HoleriteController())->handleRequest('GET', 'pdf', $holeriteId);
     });
 }
 

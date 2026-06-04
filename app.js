@@ -86,6 +86,18 @@ function formatDate(value) {
     return date.toLocaleString('pt-BR');
 }
 
+function formatCurrency(value) {
+    const amount = Number(value ?? 0);
+    if (Number.isNaN(amount)) {
+        return String(value ?? '-');
+    }
+
+    return amount.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+}
+
 async function loadCurrentUser() {
     const userName = document.getElementById('current-user-name');
     const userProfile = document.getElementById('current-user-profile');
@@ -551,6 +563,39 @@ async function loadMapa() {
     }
 }
 
+async function loadHolerites() {
+    const list = document.getElementById('holerites-list');
+    if (!list) {
+        return;
+    }
+
+    const { response, payload } = await requestJson('/api/holerites');
+    if (!response?.ok || payload?.success === false) {
+        showPageMessage(resolveApiMessage(payload, 'Falha ao carregar holerites.'));
+        return;
+    }
+
+    const holerites = payload?.data ?? [];
+    list.innerHTML = holerites.length
+        ? holerites.map((item) => {
+            const mes = String(item.MesReferencia ?? '').padStart(2, '0');
+            const ano = item.AnoReferencia ?? '';
+            return `
+                <div class="col">
+                    <div class="card panel-card shadow-sm border-0 h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h2 class="h5">${escapeHtml(mes)}/${escapeHtml(ano)}</h2>
+                            <p class="text-muted">Referência: ${escapeHtml(mes)}/${escapeHtml(ano)}</p>
+                            <p class="mb-4">Valor líquido: <strong>${escapeHtml(formatCurrency(item.ValorLiquido))}</strong></p>
+                            <a href="/api/holerites/${encodeURIComponent(item.FolhaID)}/pdf" class="btn btn-primary mt-auto"><i class="bi bi-file-earmark-pdf me-2"></i>Baixar PDF</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('')
+        : '<div class="col"><div class="text-muted">Nenhum holerite encontrado.</div></div>';
+}
+
 async function initializePage() {
     await loadCurrentUser();
 
@@ -562,7 +607,8 @@ async function initializePage() {
         loadFuncionarios(),
         loadConfiguracoes(),
         loadLogs(),
-        loadMapa()
+        loadMapa(),
+        loadHolerites()
     ]);
 }
 
