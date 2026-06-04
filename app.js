@@ -73,6 +73,29 @@ function resolveApiMessage(payload, fallback) {
     return message.trim() !== '' ? message : fallback;
 }
 
+function ensureLogoutShortcut() {
+    const existing = document.querySelector('[data-action="logout"]');
+    if (existing) {
+        return;
+    }
+
+    const main = document.querySelector('.main-shell');
+    if (!main) {
+        return;
+    }
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn btn-outline-secondary btn-sm ms-auto mb-3';
+    button.dataset.action = 'logout';
+    button.innerHTML = '<i class="bi bi-box-arrow-right me-2"></i>Sair';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'd-flex justify-content-end';
+    wrapper.appendChild(button);
+    main.prepend(wrapper);
+}
+
 function formatDate(value) {
     if (!value) {
         return '-';
@@ -115,6 +138,8 @@ async function loadCurrentUser() {
         window.location.href = './login.html';
         return null;
     }
+
+    ensureLogoutShortcut();
 
     if (userName) {
         userName.textContent = user?.Nome ? `Olá, ${user.Nome}` : 'Visitante';
@@ -563,6 +588,25 @@ async function loadMapa() {
     }
 }
 
+async function handleRegistrarPonto() {
+    const feedback = document.getElementById('ponto-feedback');
+    const { response, payload } = await requestJson('/api/ponto/registrar', { method: 'POST' });
+
+    if (!response?.ok || payload?.success === false) {
+        showPageMessage(resolveApiMessage(payload, 'Falha ao registrar ponto.'));
+        return;
+    }
+
+    const data = payload?.data ?? {};
+    if (feedback) {
+        const tipo = data.TipoBatida ?? 'Batida';
+        const horario = data.DataHoraRegistro ?? '-';
+        feedback.textContent = `${tipo} registrada as ${horario}.`;
+    }
+
+    hidePageMessage();
+}
+
 async function loadHolerites() {
     const list = document.getElementById('holerites-list');
     if (!list) {
@@ -601,13 +645,14 @@ async function initializePage() {
 
     document.getElementById('form-funcionario')?.addEventListener('submit', handleFuncionarioFormSubmit);
     document.getElementById('form-configuracao')?.addEventListener('submit', handleConfiguracaoFormSubmit);
+    document.getElementById('registrar-ponto')?.addEventListener('click', handleRegistrarPonto);
 
     await Promise.all([
         loadDashboard(),
         loadFuncionarios(),
         loadConfiguracoes(),
         loadLogs(),
-        loadMapa(),
+        loadMapa()
         loadHolerites()
     ]);
 }

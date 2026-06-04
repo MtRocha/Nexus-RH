@@ -5,6 +5,7 @@ declare(strict_types=1);
 use NexusRH\Controllers\FuncionarioController;
 use NexusRH\Controllers\AuthController;
 use NexusRH\Controllers\SistemaController;
+use NexusRH\Controllers\RegistroPontoController;
 use NexusRH\Controllers\HoleriteController;
 use NexusRH\Services\SistemaService;
 use NexusRH\Support\SessionAuth;
@@ -142,6 +143,12 @@ if (preg_match('#^/api/holerites/(\d+)/pdf$#', $normalizedPath, $matches) === 1 
 if ($normalizedPath === '/api/mapa' && $method === 'GET') {
     $dispatch(static function (): void {
         (new SistemaController())->handleRequest('GET', 'mapa');
+    });
+}
+
+if ($normalizedPath === '/api/ponto/registrar' && $method === 'POST') {
+    $dispatch(static function (): void {
+        (new RegistroPontoController())->handleRequest('POST', 'registrar');
     });
 }
 
