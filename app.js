@@ -8,6 +8,8 @@ let cargosChart = null;
 let centrosChart = null;
 let catalogosCarregados = false;
 let funcionariosCache = new Map();
+let autoRefreshTimer = null;
+const AUTO_REFRESH_MS = 20000;
 
 function escapeHtml(value) {
     return String(value ?? '')
@@ -120,6 +122,32 @@ function formatCurrency(value) {
         style: 'currency',
         currency: 'BRL'
     });
+}
+
+function formatTimeShort(value) {
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return String(value ?? '-');
+    }
+
+    return date.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function startClock() {
+    const clock = document.getElementById('clock-now');
+    if (!clock) {
+        return;
+    }
+
+    const updateClock = () => {
+        clock.textContent = formatTimeShort(new Date());
+    };
+
+    updateClock();
+    window.setInterval(updateClock, 1000);
 }
 
 async function loadCurrentUser() {
@@ -274,6 +302,11 @@ async function loadFuncionarios() {
         return;
     }
 
+    if (funcionariosDataTable) {
+        funcionariosDataTable.destroy();
+        funcionariosDataTable = null;
+    }
+
     if (!catalogosCarregados) {
         const catalogosResponse = await requestJson('/api/funcionarios?catalogos=1');
         if (!catalogosResponse.response?.ok || catalogosResponse.payload?.success === false) {
@@ -336,10 +369,6 @@ async function loadFuncionarios() {
         : '<tr><td colspan="7" class="text-center text-muted py-4">Nenhum funcionário cadastrado.</td></tr>';
 
     if (window.jQuery && window.jQuery.fn?.DataTable) {
-        if (funcionariosDataTable) {
-            funcionariosDataTable.destroy();
-        }
-
         funcionariosDataTable = window.jQuery('#funcionarios-data-table').DataTable({
             pageLength: 10,
             language: {
@@ -555,6 +584,11 @@ async function loadConfiguracoes() {
         return;
     }
 
+    if (configuracoesDataTable) {
+        configuracoesDataTable.destroy();
+        configuracoesDataTable = null;
+    }
+
     const { response, payload } = await requestJson('/api/configuracoes');
     if (!response?.ok || payload?.success === false) {
         showPageMessage(resolveApiMessage(payload, 'Falha ao carregar configurações.'));
@@ -577,10 +611,6 @@ async function loadConfiguracoes() {
         : '<tr><td colspan="6" class="text-center text-muted py-4">Nenhuma configuração encontrada.</td></tr>';
 
     if (window.jQuery && window.jQuery.fn?.DataTable) {
-        if (configuracoesDataTable) {
-            configuracoesDataTable.destroy();
-        }
-
         configuracoesDataTable = window.jQuery('#configuracoes-data-table').DataTable({
             pageLength: 10,
             language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/pt-BR.json' }
@@ -635,6 +665,16 @@ async function loadLogs() {
         return;
     }
 
+    if (logsOperacaoDataTable) {
+        logsOperacaoDataTable.destroy();
+        logsOperacaoDataTable = null;
+    }
+
+    if (logsApiDataTable) {
+        logsApiDataTable.destroy();
+        logsApiDataTable = null;
+    }
+
     const { response, payload } = await requestJson('/api/logs');
     if (!response?.ok || payload?.success === false) {
         showPageMessage(resolveApiMessage(payload, 'Falha ao carregar logs.'));
@@ -677,9 +717,6 @@ async function loadLogs() {
     }
 
     if (window.jQuery && window.jQuery.fn?.DataTable) {
-        if (logsOperacaoDataTable) logsOperacaoDataTable.destroy();
-        if (logsApiDataTable) logsApiDataTable.destroy();
-
         logsOperacaoDataTable = window.jQuery('#logs-operacao-data-table').DataTable({
             pageLength: 10,
             language: { url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/pt-BR.json' }
@@ -753,7 +790,8 @@ async function handleRegistrarPonto() {
     const data = payload?.data ?? {};
     if (feedback) {
         const tipo = data.TipoBatida ?? 'Batida';
-        const horario = data.DataHoraRegistro ?? '-';
+        const clock = document.getElementById('clock-now');
+        const horario = clock?.textContent?.trim() || formatTimeShort(new Date());
         feedback.textContent = `${tipo} registrada as ${horario}.`;
     }
 
@@ -849,6 +887,39 @@ function handleEspelhoDownload() {
     }
 
     window.location.href = `/api/ponto/espelho/pdf?inicio=${encodeURIComponent(periodo.inicio)}&fim=${encodeURIComponent(periodo.fim)}`;
+}
+
+function setupAutoRefresh() {
+    if (autoRefreshTimer) {
+        return;
+    }
+
+    const hasRefreshTargets = Boolean(
+        document.getElementById('funcionarios-table-body') ||
+        document.getElementById('configuracoes-table-body') ||
+        document.getElementById('logs-operacao-table-body') ||
+        document.getElementById('logs-api-table-body') ||
+        document.getElementById('holerites-list') ||
+        document.getElementById('espelho-resultado') ||
+        document.getElementById('dashboard-last-logs')
+    );
+
+    if (!hasRefreshTargets) {
+        return;
+    }
+
+    autoRefreshTimer = window.setInterval(() => {
+        if (document.visibilityState === 'hidden') {
+            return;
+        }
+
+        loadDashboard();
+        loadFuncionarios();
+        loadConfiguracoes();
+        loadLogs();
+        loadHolerites();
+        loadEspelhoPonto();
+    }, AUTO_REFRESH_MS);
 }
 
 async function carregarFuncionariosHolerite() {
@@ -978,6 +1049,9 @@ async function initializePage() {
     if (funcionarioModalElement) {
         funcionarioModalElement.addEventListener('hidden.bs.modal', resetFormularioFuncionarioEdicao);
     }
+
+    startClock();
+    setupAutoRefresh();
 
     await Promise.all([
         loadDashboard(),
