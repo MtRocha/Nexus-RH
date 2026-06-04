@@ -146,7 +146,7 @@ function parseLocalDateTime(value) {
         return new Date('');
     }
 
-    const match = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+    const match = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?(?:\.\d{1,6})?)?(?:Z|[+-]\d{2}:?\d{2})?$/);
     if (match) {
         const year = Number(match[1]);
         const month = Number(match[2]) - 1;
