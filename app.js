@@ -284,13 +284,26 @@ async function loadFuncionarios() {
         const catalogos = catalogosResponse.payload?.data ?? {};
         const cargosSelect = document.getElementById('cargo-select');
         const centrosSelect = document.getElementById('centro-custo-select');
+        const cargosEditSelect = document.getElementById('cargo-edit-select');
+        const centrosEditSelect = document.getElementById('centro-custo-edit-select');
+
+        const cargosOptions = '<option value="">Selecione</option>' + (catalogos.cargos ?? []).map((item) => `<option value="${escapeHtml(item.CargoID)}">${escapeHtml(item.Nome ?? '-')}</option>`).join('');
+        const centrosOptions = '<option value="">Selecione</option>' + (catalogos.centrosCusto ?? []).map((item) => `<option value="${escapeHtml(item.CentroCustoID)}">${escapeHtml(item.Nome ?? '-')}</option>`).join('');
 
         if (cargosSelect) {
-            cargosSelect.innerHTML = '<option value="">Selecione</option>' + (catalogos.cargos ?? []).map((item) => `<option value="${escapeHtml(item.CargoID)}">${escapeHtml(item.Nome ?? '-')}</option>`).join('');
+            cargosSelect.innerHTML = cargosOptions;
         }
 
         if (centrosSelect) {
-            centrosSelect.innerHTML = '<option value="">Selecione</option>' + (catalogos.centrosCusto ?? []).map((item) => `<option value="${escapeHtml(item.CentroCustoID)}">${escapeHtml(item.Nome ?? '-')}</option>`).join('');
+            centrosSelect.innerHTML = centrosOptions;
+        }
+
+        if (cargosEditSelect) {
+            cargosEditSelect.innerHTML = cargosOptions;
+        }
+
+        if (centrosEditSelect) {
+            centrosEditSelect.innerHTML = centrosOptions;
         }
 
         catalogosCarregados = true;
@@ -361,7 +374,7 @@ async function loadFuncionarios() {
             if (!funcionarioId) return;
             const funcionario = funcionariosCache.get(String(funcionarioId));
             if (!funcionario) return;
-            preencherFormularioFuncionario(funcionario);
+            preencherFormularioFuncionarioModal(funcionario);
         });
     });
 }
@@ -383,6 +396,61 @@ function setFormularioFuncionarioModo(edicao) {
         if (edicao) {
             form.senha.value = '';
         }
+    }
+}
+
+function obterModalFuncionarioEdicao() {
+    const modalElement = document.getElementById('funcionario-edicao-modal');
+    if (!modalElement || !window.bootstrap?.Modal) {
+        return null;
+    }
+
+    return window.bootstrap.Modal.getOrCreateInstance(modalElement);
+}
+
+function resetFormularioFuncionarioEdicao() {
+    const form = document.getElementById('form-funcionario-edicao');
+    if (!form) return;
+    form.reset();
+
+    const funcionarioIdField = form.querySelector('[name="funcionarioId"]');
+    if (funcionarioIdField) funcionarioIdField.value = '';
+
+    const feedback = document.getElementById('funcionario-edicao-feedback');
+    if (feedback) {
+        feedback.classList.add('d-none');
+        feedback.textContent = '';
+    }
+}
+
+function preencherFormularioFuncionarioModal(funcionario) {
+    const form = document.getElementById('form-funcionario-edicao');
+    if (!form) return;
+
+    const funcionarioIdField = form.querySelector('[name="funcionarioId"]');
+    if (funcionarioIdField) funcionarioIdField.value = funcionario.FuncionarioID ?? '';
+
+    form.nome.value = funcionario.Nome ?? '';
+    form.cpf.value = funcionario.CPF ?? '';
+    form.email.value = funcionario.Email ?? '';
+    form.senha.value = '';
+    form.perfilAcesso.value = funcionario.PerfilAcesso ?? 'Usuario';
+    form.cargoId.value = funcionario.CargoID ?? '';
+    form.centroCustoId.value = funcionario.CentroCustoID ?? '';
+    form.supervisorId.value = funcionario.SupervisorID ?? '';
+    form.salarioAtual.value = funcionario.SalarioAtual ?? '';
+    form.dataAdmissao.value = funcionario.DataAdmissao ?? '';
+    form.status.value = funcionario.Status ?? 'Ativo';
+
+    const feedback = document.getElementById('funcionario-edicao-feedback');
+    if (feedback) {
+        feedback.classList.add('d-none');
+        feedback.textContent = '';
+    }
+
+    const modal = obterModalFuncionarioEdicao();
+    if (modal) {
+        modal.show();
     }
 }
 
@@ -420,13 +488,13 @@ function resetFormularioFuncionario() {
 
 async function handleFuncionarioFormSubmit(event) {
     const form = event.target;
-    if (!form || form.id !== 'form-funcionario') {
+    if (!form || (form.id !== 'form-funcionario' && form.id !== 'form-funcionario-edicao')) {
         return;
     }
 
     event.preventDefault();
 
-    const funcionarioId = document.getElementById('funcionario-id')?.value;
+    const funcionarioId = form.querySelector('[name="funcionarioId"]')?.value;
     const editando = funcionarioId && String(funcionarioId).trim() !== '';
     const senhaValue = form.senha.value;
 
@@ -450,7 +518,9 @@ async function handleFuncionarioFormSubmit(event) {
         body: JSON.stringify(payload)
     });
 
-    const feedback = document.getElementById('funcionario-feedback');
+    const feedback = form.id === 'form-funcionario-edicao'
+        ? document.getElementById('funcionario-edicao-feedback')
+        : document.getElementById('funcionario-feedback');
     if (feedback) {
         feedback.textContent = resolveApiMessage(
             result,
@@ -463,7 +533,15 @@ async function handleFuncionarioFormSubmit(event) {
     }
 
     if (response?.ok) {
-        resetFormularioFuncionario();
+        if (form.id === 'form-funcionario-edicao') {
+            const modal = obterModalFuncionarioEdicao();
+            if (modal) {
+                modal.hide();
+            }
+            resetFormularioFuncionarioEdicao();
+        } else {
+            resetFormularioFuncionario();
+        }
         await loadFuncionarios();
         hidePageMessage();
     } else {
@@ -879,6 +957,7 @@ async function initializePage() {
     const currentUser = await loadCurrentUser();
 
     document.getElementById('form-funcionario')?.addEventListener('submit', handleFuncionarioFormSubmit);
+    document.getElementById('form-funcionario-edicao')?.addEventListener('submit', handleFuncionarioFormSubmit);
     document.getElementById('funcionario-cancelar')?.addEventListener('click', resetFormularioFuncionario);
     document.getElementById('form-configuracao')?.addEventListener('submit', handleConfiguracaoFormSubmit);
     document.getElementById('registrar-ponto')?.addEventListener('click', handleRegistrarPonto);
@@ -893,6 +972,11 @@ async function initializePage() {
 
     if (document.getElementById('form-funcionario')) {
         setFormularioFuncionarioModo(false);
+    }
+
+    const funcionarioModalElement = document.getElementById('funcionario-edicao-modal');
+    if (funcionarioModalElement) {
+        funcionarioModalElement.addEventListener('hidden.bs.modal', resetFormularioFuncionarioEdicao);
     }
 
     await Promise.all([
