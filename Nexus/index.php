@@ -73,6 +73,12 @@ if ($normalizedPath === '/api/auth/login' && $method === 'POST') {
     });
 }
 
+if ($normalizedPath === '/api/auth/password/reset/cpf' && $method === 'POST') {
+    $dispatch(static function (): void {
+        (new AuthController())->handleRequest('POST', 'password-reset-cpf');
+    });
+}
+
 if ($normalizedPath === '/api/auth/mfa/verify' && $method === 'POST') {
     $dispatch(static function (): void {
         (new AuthController())->handleRequest('POST', 'mfa-verify');

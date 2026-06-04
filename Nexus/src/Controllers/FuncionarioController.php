@@ -66,7 +66,7 @@ final class FuncionarioController
         } catch (ValidationException | BusinessRuleException $exception) {
             JsonResponse::error($exception->getMessage(), 400);
         } catch (Throwable $exception) {
-            JsonResponse::error('Erro interno no servidor.', 500);
+            JsonResponse::error($exception->getMessage() !== '' ? $exception->getMessage() : 'Erro interno no servidor.', 500);
         }
     }
 

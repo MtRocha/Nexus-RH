@@ -70,4 +70,12 @@ final class AutenticacaoDAO extends BaseDAO
         $statement->bindValue(':FuncionarioID', $funcionarioId, PDO::PARAM_INT);
         $statement->execute();
     }
+
+    public function atualizarSenhaFuncionario(int $funcionarioId, string $senhaHash): void
+    {
+        $statement = $this->connection->prepare('UPDATE Funcionario SET SenhaHash = :SenhaHash WHERE FuncionarioID = :FuncionarioID;');
+        $statement->bindValue(':SenhaHash', $senhaHash);
+        $statement->bindValue(':FuncionarioID', $funcionarioId, PDO::PARAM_INT);
+        $statement->execute();
+    }
 }

@@ -6,11 +6,17 @@
     --nexus-bg: #eef3f9;
 }
 
+html,
+body {
+    height: 100%;
+}
+
 body {
     background:
         radial-gradient(circle at top right, rgba(0, 74, 141, 0.14), transparent 35%),
         linear-gradient(180deg, #f7fbff 0%, var(--nexus-bg) 100%);
     color: var(--nexus-ink);
+    overflow-x: hidden;
 }
 
 .sidebar-shell {
@@ -142,6 +148,10 @@ body {
     background:
         radial-gradient(circle at top right, rgba(0, 74, 141, 0.18) 0%, rgba(0, 74, 141, 0.02) 35%),
         linear-gradient(180deg, #f6fbff 0%, #ecf2f8 100%);
+}
+
+.login-shell .row.min-vh-100 {
+    min-height: calc(100vh - 2rem);
 }
 
 .login-brand-panel {

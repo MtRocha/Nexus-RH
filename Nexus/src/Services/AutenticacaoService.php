@@ -142,6 +142,33 @@ final class AutenticacaoService
         ];
     }
 
+    public function resetarSenhaPorCpf(string $cpf, string $senha): void
+    {
+        $cpf = preg_replace('/\D/', '', $cpf ?? '') ?? '';
+        $senha = trim($senha);
+
+        if ($cpf === '') {
+            throw new ValidationException('CPF obrigatorio para reset de senha.');
+        }
+
+        if ($senha === '' || strlen($senha) < 6) {
+            throw new ValidationException('Senha deve ter pelo menos 6 caracteres.');
+        }
+
+        $funcionario = $this->autenticacaoDAO->buscarFuncionarioPorLogin($cpf);
+        if ($funcionario === null) {
+            throw new BusinessRuleException('CPF nao encontrado.');
+        }
+
+        $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+        if ($senhaHash === false) {
+            throw new BusinessRuleException('Falha ao gerar senha.');
+        }
+
+        $this->autenticacaoDAO->atualizarSenhaFuncionario((int) $funcionario['FuncionarioID'], $senhaHash);
+        $this->sistemaService->registrarOperacao('RESET_SENHA', 'Senha redefinida por CPF.', true, ['FuncionarioID' => $funcionario['FuncionarioID']], 'Funcionario', (string) $funcionario['FuncionarioID']);
+    }
+
     private function sanitizarUsuario(array $funcionario): array
     {
         return [
@@ -152,4 +179,5 @@ final class AutenticacaoService
             'PerfilAcesso' => (string) $funcionario['PerfilAcesso'],
         ];
     }
+
 }

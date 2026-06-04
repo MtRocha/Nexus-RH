@@ -18,17 +18,59 @@ function escapeHtml(value) {
 }
 
 async function requestJson(path, options = {}) {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-        credentials: 'same-origin',
-        headers: {
-            'Content-Type': 'application/json',
-            ...(options.headers ?? {})
-        },
-        ...options
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}${path}`, {
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers ?? {})
+            },
+            ...options
+        });
 
-    const payload = await response.json().catch(() => ({}));
-    return { response, payload };
+        const payload = await response.json().catch(() => ({}));
+        return { response, payload };
+    } catch (error) {
+        return {
+            response: null,
+            payload: {
+                success: false,
+                message: 'Falha de rede ao conectar na API.'
+            }
+        };
+    }
+}
+
+function ensurePageMessageBox() {
+    let box = document.getElementById('page-message');
+    if (box) {
+        return box;
+    }
+
+    const container = document.querySelector('.main-shell') || document.body;
+    box = document.createElement('div');
+    box.id = 'page-message';
+    box.className = 'alert d-none';
+    container.prepend(box);
+    return box;
+}
+
+function showPageMessage(text, kind = 'danger') {
+    const box = ensurePageMessageBox();
+    box.textContent = text;
+    box.className = `alert alert-${kind}`;
+    box.classList.remove('d-none');
+}
+
+function hidePageMessage() {
+    const box = document.getElementById('page-message');
+    if (!box) return;
+    box.classList.add('d-none');
+}
+
+function resolveApiMessage(payload, fallback) {
+    const message = payload?.message ?? '';
+    return message.trim() !== '' ? message : fallback;
 }
 
 function formatDate(value) {
@@ -57,7 +99,7 @@ async function loadCurrentUser() {
     const { response, payload } = await requestJson('/api/auth/me');
     const user = payload?.data ?? null;
 
-    if (requiresAuth && (!response.ok || !user)) {
+    if (requiresAuth && (!response?.ok || !user)) {
         window.location.href = './login.html';
         return null;
     }
@@ -94,7 +136,12 @@ async function loadDashboard() {
         return;
     }
 
-    const { payload } = await requestJson('/api/dashboard');
+    const { response, payload } = await requestJson('/api/dashboard');
+    if (!response?.ok || payload?.success === false) {
+        showPageMessage(resolveApiMessage(payload, 'Falha ao carregar o dashboard.'));
+        return;
+    }
+
     const data = payload?.data ?? {};
     const resumo = data ?? {};
     const configuracoes = resumo.Configuracoes ?? {};
@@ -191,6 +238,11 @@ async function loadFuncionarios() {
 
     if (!catalogosCarregados) {
         const catalogosResponse = await requestJson('/api/funcionarios?catalogos=1');
+        if (!catalogosResponse.response?.ok || catalogosResponse.payload?.success === false) {
+            showPageMessage(resolveApiMessage(catalogosResponse.payload, 'Falha ao carregar catálogos.'));
+            return;
+        }
+
         const catalogos = catalogosResponse.payload?.data ?? {};
         const cargosSelect = document.getElementById('cargo-select');
         const centrosSelect = document.getElementById('centro-custo-select');
@@ -207,7 +259,12 @@ async function loadFuncionarios() {
     }
 
     const { response, payload } = await requestJson('/api/funcionarios');
-    const funcionarios = response.ok && payload?.success ? (payload.data ?? []) : [];
+    if (!response?.ok || payload?.success === false) {
+        showPageMessage(resolveApiMessage(payload, 'Falha ao carregar funcionários.'));
+        return;
+    }
+
+    const funcionarios = payload.data ?? [];
 
     tableBody.innerHTML = funcionarios.length
         ? funcionarios.map((item) => `
@@ -247,10 +304,14 @@ async function loadFuncionarios() {
                 return;
             }
 
-            const { response } = await requestJson(`/api/funcionarios/${funcionarioId}`, { method: 'DELETE' });
-            if (response.ok) {
+            const { response, payload } = await requestJson(`/api/funcionarios/${funcionarioId}`, { method: 'DELETE' });
+            if (response?.ok) {
                 await loadFuncionarios();
+                hidePageMessage();
+                return;
             }
+
+            showPageMessage(resolveApiMessage(payload, 'Falha ao desativar funcionário.'));
         });
     });
 }
@@ -284,14 +345,17 @@ async function handleFuncionarioFormSubmit(event) {
 
     const feedback = document.getElementById('funcionario-feedback');
     if (feedback) {
-        feedback.textContent = result.message ?? (response.ok ? 'Funcionário criado com sucesso.' : 'Falha ao criar funcionário.');
-        feedback.className = `alert ${response.ok ? 'alert-success' : 'alert-danger'}`;
+        feedback.textContent = resolveApiMessage(result, response?.ok ? 'Funcionário criado com sucesso.' : 'Falha ao criar funcionário.');
+        feedback.className = `alert ${response?.ok ? 'alert-success' : 'alert-danger'}`;
         feedback.classList.remove('d-none');
     }
 
-    if (response.ok) {
+    if (response?.ok) {
         form.reset();
         await loadFuncionarios();
+        hidePageMessage();
+    } else {
+        showPageMessage(resolveApiMessage(result, 'Falha ao criar funcionário.'));
     }
 }
 
@@ -302,7 +366,12 @@ async function loadConfiguracoes() {
     }
 
     const { response, payload } = await requestJson('/api/configuracoes');
-    const configuracoes = response.ok && payload?.success ? (payload.data ?? []) : [];
+    if (!response?.ok || payload?.success === false) {
+        showPageMessage(resolveApiMessage(payload, 'Falha ao carregar configurações.'));
+        return;
+    }
+
+    const configuracoes = payload.data ?? [];
 
     tableBody.innerHTML = configuracoes.length
         ? configuracoes.map((item) => `
@@ -354,14 +423,17 @@ async function handleConfiguracaoFormSubmit(event) {
 
     const feedback = document.getElementById('configuracao-feedback');
     if (feedback) {
-        feedback.textContent = result.message ?? (response.ok ? 'Configuração salva com sucesso.' : 'Falha ao salvar configuração.');
-        feedback.className = `alert ${response.ok ? 'alert-success' : 'alert-danger'}`;
+        feedback.textContent = resolveApiMessage(result, response?.ok ? 'Configuração salva com sucesso.' : 'Falha ao salvar configuração.');
+        feedback.className = `alert ${response?.ok ? 'alert-success' : 'alert-danger'}`;
         feedback.classList.remove('d-none');
     }
 
-    if (response.ok) {
+    if (response?.ok) {
         form.reset();
         await loadConfiguracoes();
+        hidePageMessage();
+    } else {
+        showPageMessage(resolveApiMessage(result, 'Falha ao salvar configuração.'));
     }
 }
 
@@ -374,7 +446,12 @@ async function loadLogs() {
     }
 
     const { response, payload } = await requestJson('/api/logs');
-    const data = response.ok && payload?.success ? (payload.data ?? {}) : {};
+    if (!response?.ok || payload?.success === false) {
+        showPageMessage(resolveApiMessage(payload, 'Falha ao carregar logs.'));
+        return;
+    }
+
+    const data = payload.data ?? {};
 
     const operacoes = data.operacoes ?? [];
     const apiLogs = data.api ?? [];
@@ -434,7 +511,12 @@ async function loadMapa() {
         return;
     }
 
-    const { payload } = await requestJson('/api/mapa');
+    const { response, payload } = await requestJson('/api/mapa');
+    if (!response?.ok || payload?.success === false) {
+        showPageMessage(resolveApiMessage(payload, 'Falha ao carregar dados do mapa.'));
+        return;
+    }
+
     const mapa = payload?.data ?? {};
 
     if (title) {

@@ -63,8 +63,8 @@ final class SistemaController
             JsonResponse::error('Metodo HTTP nao suportado para este endpoint.', 405);
         } catch (ValidationException | BusinessRuleException $exception) {
             JsonResponse::error($exception->getMessage(), 400);
-        } catch (Throwable) {
-            JsonResponse::error('Erro interno no servidor.', 500);
+        } catch (Throwable $exception) {
+            JsonResponse::error($exception->getMessage() !== '' ? $exception->getMessage() : 'Erro interno no servidor.', 500);
         }
     }
 
