@@ -27,6 +27,24 @@ final class RegistroPontoController
                 return;
             }
 
+            if ($method === 'GET' && $action === 'espelho') {
+                $inicio = (string) ($_GET['inicio'] ?? '');
+                $fim = (string) ($_GET['fim'] ?? '');
+                JsonResponse::success($this->registroPontoService->listarEspelho($inicio, $fim));
+                return;
+            }
+
+            if ($method === 'GET' && $action === 'espelho-pdf') {
+                $inicio = (string) ($_GET['inicio'] ?? '');
+                $fim = (string) ($_GET['fim'] ?? '');
+                $pdf = $this->registroPontoService->gerarEspelhoPdf($inicio, $fim);
+                header('Content-Type: application/pdf');
+                header('Content-Disposition: attachment; filename="' . $pdf['filename'] . '"');
+                header('Content-Length: ' . strlen($pdf['content']));
+                echo $pdf['content'];
+                return;
+            }
+
             JsonResponse::error('Metodo HTTP nao suportado para este endpoint.', 405);
         } catch (ValidationException | BusinessRuleException $exception) {
             JsonResponse::error($exception->getMessage(), 400);

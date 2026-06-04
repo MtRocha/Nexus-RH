@@ -133,6 +133,12 @@ if ($normalizedPath === '/api/holerites' && $method === 'GET') {
     });
 }
 
+if ($normalizedPath === '/api/holerites' && $method === 'POST') {
+    $dispatch(static function (): void {
+        (new HoleriteController())->handleRequest('POST', 'create');
+    });
+}
+
 if (preg_match('#^/api/holerites/(\d+)/pdf$#', $normalizedPath, $matches) === 1 && $method === 'GET') {
     $holeriteId = (int) $matches[1];
     $dispatch(static function () use ($holeriteId): void {
@@ -149,6 +155,18 @@ if ($normalizedPath === '/api/mapa' && $method === 'GET') {
 if ($normalizedPath === '/api/ponto/registrar' && $method === 'POST') {
     $dispatch(static function (): void {
         (new RegistroPontoController())->handleRequest('POST', 'registrar');
+    });
+}
+
+if ($normalizedPath === '/api/ponto/espelho' && $method === 'GET') {
+    $dispatch(static function (): void {
+        (new RegistroPontoController())->handleRequest('GET', 'espelho');
+    });
+}
+
+if ($normalizedPath === '/api/ponto/espelho/pdf' && $method === 'GET') {
+    $dispatch(static function (): void {
+        (new RegistroPontoController())->handleRequest('GET', 'espelho-pdf');
     });
 }
 
@@ -171,6 +189,14 @@ if (preg_match('#^/api/funcionarios/(\d+)$#', $normalizedPath, $matches) === 1 &
     $dispatch(static function () use ($funcionarioId): void {
         $controller = new FuncionarioController();
         $controller->handleRequest('GET', $funcionarioId);
+    });
+}
+
+if (preg_match('#^/api/funcionarios/(\d+)$#', $normalizedPath, $matches) === 1 && $method === 'PUT') {
+    $funcionarioId = (int) $matches[1];
+    $dispatch(static function () use ($funcionarioId): void {
+        $controller = new FuncionarioController();
+        $controller->handleRequest('PUT', $funcionarioId);
     });
 }
 

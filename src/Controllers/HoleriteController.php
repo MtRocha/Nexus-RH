@@ -27,6 +27,19 @@ final class HoleriteController
                 return;
             }
 
+            if ($method === 'POST' && $action === 'create') {
+                $payload = $this->readJsonPayload();
+                $resultado = $this->holeriteService->gerarPorAdmin(
+                    (int) ($payload['funcionarioId'] ?? 0),
+                    (int) ($payload['mes'] ?? 0),
+                    (int) ($payload['ano'] ?? 0),
+                    (int) ($payload['diasTrabalhados'] ?? 0)
+                );
+
+                JsonResponse::success($resultado, 'Holerite gerado com sucesso.', 201);
+                return;
+            }
+
             if ($method === 'GET' && $action === 'pdf' && $holeriteId !== null) {
                 $pdf = $this->holeriteService->gerarPdfPorId($holeriteId);
                 header('Content-Type: application/pdf');
@@ -42,5 +55,22 @@ final class HoleriteController
         } catch (Throwable $exception) {
             JsonResponse::error($exception->getMessage() !== '' ? $exception->getMessage() : 'Erro interno no servidor.', 500);
         }
+    }
+
+    private function readJsonPayload(): array
+    {
+        $rawInput = file_get_contents('php://input');
+
+        if ($rawInput === false || trim($rawInput) === '') {
+            throw new ValidationException('Corpo da requisicao vazio.');
+        }
+
+        $payload = json_decode($rawInput, true);
+
+        if (!is_array($payload)) {
+            throw new ValidationException('JSON invalido no corpo da requisicao.');
+        }
+
+        return $payload;
     }
 }

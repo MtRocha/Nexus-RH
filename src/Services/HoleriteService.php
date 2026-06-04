@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NexusRH\Services;
 
+use DateTime;
+use NexusRH\DAO\FuncionarioDAO;
 use NexusRH\DAO\HoleriteDAO;
 use NexusRH\Exceptions\BusinessRuleException;
 use NexusRH\Exceptions\ValidationException;
@@ -12,10 +14,14 @@ use NexusRH\Support\SessionAuth;
 final class HoleriteService
 {
     private HoleriteDAO $holeriteDAO;
+    private FuncionarioDAO $funcionarioDAO;
+    private SistemaService $sistemaService;
 
     public function __construct()
     {
         $this->holeriteDAO = new HoleriteDAO();
+        $this->funcionarioDAO = new FuncionarioDAO();
+        $this->sistemaService = new SistemaService();
     }
 
     public function listarPorUsuarioAtual(): array
@@ -61,6 +67,102 @@ final class HoleriteService
             'filename' => 'holerite-' . $mes . '-' . $ano . '.pdf',
             'content' => $pdf,
         ];
+    }
+
+    public function gerarPorAdmin(int $funcionarioId, int $mes, int $ano, int $diasTrabalhados): array
+    {
+        $usuario = SessionAuth::currentUser();
+        if ($usuario === null) {
+            throw new ValidationException('Usuario nao autenticado.');
+        }
+
+        if (($usuario['PerfilAcesso'] ?? '') !== 'Administrador') {
+            throw new BusinessRuleException('Acesso restrito a administradores.');
+        }
+
+        if ($funcionarioId <= 0) {
+            throw new ValidationException('FuncionarioID invalido.');
+        }
+
+        if ($mes < 1 || $mes > 12) {
+            throw new ValidationException('Mes de referencia invalido.');
+        }
+
+        if ($ano < 2000 || $ano > 2100) {
+            throw new ValidationException('Ano de referencia invalido.');
+        }
+
+        if ($diasTrabalhados < 0 || $diasTrabalhados > 31) {
+            throw new ValidationException('Dias trabalhados invalido.');
+        }
+
+        $funcionario = $this->funcionarioDAO->buscarPorId($funcionarioId);
+        if ($funcionario === null) {
+            throw new BusinessRuleException('Funcionario nao encontrado.');
+        }
+
+        $existente = $this->holeriteDAO->buscarPorReferencia($funcionarioId, $mes, $ano);
+        if ($existente !== null) {
+            throw new BusinessRuleException('Ja existe holerite para este periodo.');
+        }
+
+        $salarioBase = (float) ($funcionario['SalarioAtual'] ?? 0);
+        if ($salarioBase <= 0) {
+            throw new BusinessRuleException('Salario do funcionario invalido.');
+        }
+
+        $proventos = $salarioBase * ($diasTrabalhados / 30);
+        $totalProventos = round($proventos, 2);
+        $totalDescontos = 0.0;
+        $valorLiquido = max(0.0, $totalProventos - $totalDescontos);
+
+        $dataPagamento = $this->obterDataPagamento($ano, $mes);
+        $folhaId = $this->holeriteDAO->inserir(
+            $funcionarioId,
+            $mes,
+            $ano,
+            $salarioBase,
+            $totalProventos,
+            $totalDescontos,
+            $valorLiquido,
+            $dataPagamento,
+            isset($usuario['FuncionarioID']) ? (int) $usuario['FuncionarioID'] : null
+        );
+
+        $this->sistemaService->registrarOperacao(
+            'Holerite',
+            'Holerite gerado manualmente.',
+            true,
+            [
+                'FuncionarioID' => $funcionarioId,
+                'MesReferencia' => $mes,
+                'AnoReferencia' => $ano,
+                'DiasTrabalhados' => $diasTrabalhados,
+                'ValorLiquido' => $valorLiquido,
+            ],
+            'FolhaPagamento',
+            (string) $folhaId
+        );
+
+        return [
+            'FolhaID' => $folhaId,
+            'FuncionarioID' => $funcionarioId,
+            'MesReferencia' => $mes,
+            'AnoReferencia' => $ano,
+            'ValorLiquido' => $valorLiquido,
+            'DataPagamento' => $dataPagamento,
+        ];
+    }
+
+    private function obterDataPagamento(int $ano, int $mes): string
+    {
+        $data = DateTime::createFromFormat('Y-n-j', sprintf('%04d-%d-1', $ano, $mes));
+        if ($data === false) {
+            return date('Y-m-d');
+        }
+
+        $data->modify('last day of this month');
+        return $data->format('Y-m-d');
     }
 
     private function buildSimplePdf(string $title, array $lines): string

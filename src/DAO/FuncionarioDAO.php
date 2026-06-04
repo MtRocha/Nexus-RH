@@ -146,6 +146,50 @@ final class FuncionarioDAO extends BaseDAO
         $statement->execute();
     }
 
+    public function atualizar(FuncionarioDTO $funcionario, bool $alterarSenha): void
+    {
+        $sql = <<<SQL
+            UPDATE Funcionario
+            SET Nome = :Nome,
+                CPF = :CPF,
+                Email = :Email,
+                PerfilAcesso = :PerfilAcesso,
+                CargoID = :CargoID,
+                CentroCustoID = :CentroCustoID,
+                SupervisorID = :SupervisorID,
+                SalarioAtual = :SalarioAtual,
+                DataAdmissao = :DataAdmissao,
+                DataDesligamento = :DataDesligamento,
+                Status = :Status
+        SQL;
+
+        if ($alterarSenha) {
+            $sql .= ', SenhaHash = :SenhaHash';
+        }
+
+        $sql .= ' WHERE FuncionarioID = :FuncionarioID;';
+
+        $statement = $this->connection->prepare($sql);
+        $statement->bindValue(':Nome', $funcionario->Nome);
+        $statement->bindValue(':CPF', $funcionario->CPF);
+        $statement->bindValue(':Email', $funcionario->Email);
+        $statement->bindValue(':PerfilAcesso', $funcionario->PerfilAcesso);
+        $statement->bindValue(':CargoID', $funcionario->CargoID, PDO::PARAM_INT);
+        $statement->bindValue(':CentroCustoID', $funcionario->CentroCustoID, PDO::PARAM_INT);
+        $statement->bindValue(':SupervisorID', $funcionario->SupervisorID, $funcionario->SupervisorID === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+        $statement->bindValue(':SalarioAtual', $funcionario->SalarioAtual);
+        $statement->bindValue(':DataAdmissao', $funcionario->DataAdmissao);
+        $statement->bindValue(':DataDesligamento', $funcionario->DataDesligamento);
+        $statement->bindValue(':Status', $funcionario->Status);
+        $statement->bindValue(':FuncionarioID', $funcionario->FuncionarioID, PDO::PARAM_INT);
+
+        if ($alterarSenha) {
+            $statement->bindValue(':SenhaHash', $funcionario->SenhaHash);
+        }
+
+        $statement->execute();
+    }
+
     public function buscarTodos(): array
     {
         $sql = <<<SQL

@@ -32,4 +32,47 @@ final class HoleriteDAO extends BaseDAO
 
         return $data !== false ? $data : null;
     }
+
+    public function buscarPorReferencia(int $funcionarioId, int $mes, int $ano): ?array
+    {
+        $statement = $this->connection->prepare(
+            'SELECT FolhaID FROM FolhaPagamento WHERE FuncionarioID = :FuncionarioID AND MesReferencia = :MesReferencia AND AnoReferencia = :AnoReferencia LIMIT 1;'
+        );
+        $statement->bindValue(':FuncionarioID', $funcionarioId, PDO::PARAM_INT);
+        $statement->bindValue(':MesReferencia', $mes, PDO::PARAM_INT);
+        $statement->bindValue(':AnoReferencia', $ano, PDO::PARAM_INT);
+        $statement->execute();
+
+        $data = $statement->fetch();
+
+        return $data !== false ? $data : null;
+    }
+
+    public function inserir(
+        int $funcionarioId,
+        int $mes,
+        int $ano,
+        float $salarioBase,
+        float $totalProventos,
+        float $totalDescontos,
+        float $valorLiquido,
+        string $dataPagamento,
+        ?int $fechadaPor
+    ): int {
+        $statement = $this->connection->prepare(
+            'INSERT INTO FolhaPagamento (FuncionarioID, MesReferencia, AnoReferencia, SalarioBase, TotalProventos, TotalDescontos, ValorLiquido, DataPagamento, FechadaPor) VALUES (:FuncionarioID, :MesReferencia, :AnoReferencia, :SalarioBase, :TotalProventos, :TotalDescontos, :ValorLiquido, :DataPagamento, :FechadaPor);'
+        );
+        $statement->bindValue(':FuncionarioID', $funcionarioId, PDO::PARAM_INT);
+        $statement->bindValue(':MesReferencia', $mes, PDO::PARAM_INT);
+        $statement->bindValue(':AnoReferencia', $ano, PDO::PARAM_INT);
+        $statement->bindValue(':SalarioBase', $salarioBase);
+        $statement->bindValue(':TotalProventos', $totalProventos);
+        $statement->bindValue(':TotalDescontos', $totalDescontos);
+        $statement->bindValue(':ValorLiquido', $valorLiquido);
+        $statement->bindValue(':DataPagamento', $dataPagamento);
+        $statement->bindValue(':FechadaPor', $fechadaPor, $fechadaPor === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+        $statement->execute();
+
+        return (int) $this->connection->lastInsertId();
+    }
 }

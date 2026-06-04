@@ -33,4 +33,17 @@ final class RegistroPontoDAO extends BaseDAO
 
         return (int) $this->connection->lastInsertId();
     }
+
+    public function listarPorPeriodo(int $funcionarioId, string $inicio, string $fim): array
+    {
+        $statement = $this->connection->prepare(
+            'SELECT PontoID, DataHoraRegistro, TipoBatida, Origem, StatusAprovacao FROM RegistroPonto WHERE FuncionarioID = :FuncionarioID AND DATE(DataHoraRegistro) BETWEEN :Inicio AND :Fim ORDER BY DataHoraRegistro ASC;'
+        );
+        $statement->bindValue(':FuncionarioID', $funcionarioId, PDO::PARAM_INT);
+        $statement->bindValue(':Inicio', $inicio);
+        $statement->bindValue(':Fim', $fim);
+        $statement->execute();
+
+        return $statement->fetchAll();
+    }
 }

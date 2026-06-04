@@ -20,12 +20,40 @@ final class FuncionarioService
 
     public function criar(FuncionarioDTO $funcionario): int
     {
-        $this->validarDadosObrigatorios($funcionario);
-        $this->validarCpfUnico($funcionario->CPF);
+        $this->validarDadosObrigatorios($funcionario, true);
+        $this->validarCpfUnico($funcionario->CPF, null);
         $this->validarCentroCusto($funcionario->CentroCustoID);
         $this->validarSupervisor($funcionario->SupervisorID);
 
         return $this->funcionarioDAO->inserir($funcionario);
+    }
+
+    public function atualizar(FuncionarioDTO $funcionario): void
+    {
+        if ($funcionario->FuncionarioID === null || $funcionario->FuncionarioID <= 0) {
+            throw new ValidationException('FuncionarioID invalido. Informe um valor inteiro positivo.');
+        }
+
+        $existente = $this->funcionarioDAO->buscarPorId($funcionario->FuncionarioID);
+        if ($existente === null) {
+            throw new BusinessRuleException('Funcionario nao encontrado.');
+        }
+
+        $alterarSenha = trim($funcionario->SenhaHash) !== '';
+        $this->validarDadosObrigatorios($funcionario, $alterarSenha);
+        $this->validarCpfUnico($funcionario->CPF, $funcionario->FuncionarioID);
+        $this->validarCentroCusto($funcionario->CentroCustoID);
+        $this->validarSupervisor($funcionario->SupervisorID);
+
+        if (trim($funcionario->DataAdmissao) === '') {
+            $funcionario->DataAdmissao = (string) ($existente['DataAdmissao'] ?? '');
+        }
+
+        if ($funcionario->DataDesligamento === null) {
+            $funcionario->DataDesligamento = $existente['DataDesligamento'] ?? null;
+        }
+
+        $this->funcionarioDAO->atualizar($funcionario, $alterarSenha);
     }
 
     public function buscarPorId(int $funcionarioId): ?array
@@ -63,7 +91,7 @@ final class FuncionarioService
         $this->funcionarioDAO->desativar($funcionarioId);
     }
 
-    private function validarDadosObrigatorios(FuncionarioDTO $funcionario): void
+    private function validarDadosObrigatorios(FuncionarioDTO $funcionario, bool $requireSenha): void
     {
         if (trim($funcionario->Nome) === '') {
             throw new ValidationException('Nome e obrigatorio.');
@@ -86,7 +114,7 @@ final class FuncionarioService
             throw new ValidationException('CentroCustoID invalido.');
         }
 
-        if (trim($funcionario->SenhaHash) === '') {
+        if ($requireSenha && trim($funcionario->SenhaHash) === '') {
             throw new ValidationException('SenhaHash e obrigatorio.');
         }
 
@@ -103,12 +131,12 @@ final class FuncionarioService
         }
     }
 
-    private function validarCpfUnico(string $cpf): void
+    private function validarCpfUnico(string $cpf, ?int $funcionarioId): void
     {
         $cpfLimpo = preg_replace('/\D/', '', $cpf) ?? '';
         $existente = $this->funcionarioDAO->buscarPorCpf($cpfLimpo);
 
-        if ($existente !== null) {
+        if ($existente !== null && (int) ($existente['FuncionarioID'] ?? 0) !== (int) ($funcionarioId ?? 0)) {
             throw new BusinessRuleException('Ja existe um funcionario cadastrado com este CPF.');
         }
     }

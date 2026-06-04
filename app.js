@@ -7,6 +7,7 @@ let logsApiDataTable = null;
 let cargosChart = null;
 let centrosChart = null;
 let catalogosCarregados = false;
+let funcionariosCache = new Map();
 
 function escapeHtml(value) {
     return String(value ?? '')
@@ -302,6 +303,7 @@ async function loadFuncionarios() {
     }
 
     const funcionarios = payload.data ?? [];
+    funcionariosCache = new Map((funcionarios ?? []).map((item) => [String(item.FuncionarioID), item]));
 
     tableBody.innerHTML = funcionarios.length
         ? funcionarios.map((item) => `
@@ -313,6 +315,7 @@ async function loadFuncionarios() {
                 <td>${escapeHtml(item.Email ?? '-')}</td>
                 <td><span class="badge text-bg-${(item.Status ?? '') === 'Ativo' ? 'success' : 'secondary'}">${escapeHtml(item.Status ?? '-')}</span></td>
                 <td class="text-end">
+                    <button class="btn btn-sm btn-outline-primary me-2" data-edit-funcionario="${item.FuncionarioID}"><i class="bi bi-pencil"></i></button>
                     <button class="btn btn-sm btn-outline-danger" data-delete-funcionario="${item.FuncionarioID}"><i class="bi bi-trash"></i></button>
                 </td>
             </tr>
@@ -351,6 +354,68 @@ async function loadFuncionarios() {
             showPageMessage(resolveApiMessage(payload, 'Falha ao desativar funcionário.'));
         });
     });
+
+    document.querySelectorAll('[data-edit-funcionario]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const funcionarioId = button.getAttribute('data-edit-funcionario');
+            if (!funcionarioId) return;
+            const funcionario = funcionariosCache.get(String(funcionarioId));
+            if (!funcionario) return;
+            preencherFormularioFuncionario(funcionario);
+        });
+    });
+}
+
+function setFormularioFuncionarioModo(edicao) {
+    const form = document.getElementById('form-funcionario');
+    if (!form) return;
+
+    const title = document.getElementById('funcionario-form-title');
+    const submitText = document.getElementById('funcionario-submit-text');
+    const cancelButton = document.getElementById('funcionario-cancelar');
+
+    if (title) title.textContent = edicao ? 'Editar funcionario' : 'Novo funcionario';
+    if (submitText) submitText.textContent = edicao ? 'Salvar alteracoes' : 'Salvar funcionario';
+    if (cancelButton) cancelButton.classList.toggle('d-none', !edicao);
+
+    if (form.senha) {
+        form.senha.required = !edicao;
+        if (edicao) {
+            form.senha.value = '';
+        }
+    }
+}
+
+function preencherFormularioFuncionario(funcionario) {
+    const form = document.getElementById('form-funcionario');
+    if (!form) return;
+
+    const funcionarioIdField = document.getElementById('funcionario-id');
+    if (funcionarioIdField) funcionarioIdField.value = funcionario.FuncionarioID ?? '';
+
+    form.nome.value = funcionario.Nome ?? '';
+    form.cpf.value = funcionario.CPF ?? '';
+    form.email.value = funcionario.Email ?? '';
+    form.perfilAcesso.value = funcionario.PerfilAcesso ?? 'Usuario';
+    form.cargoId.value = funcionario.CargoID ?? '';
+    form.centroCustoId.value = funcionario.CentroCustoID ?? '';
+    form.supervisorId.value = funcionario.SupervisorID ?? '';
+    form.salarioAtual.value = funcionario.SalarioAtual ?? '';
+    form.dataAdmissao.value = funcionario.DataAdmissao ?? '';
+    form.status.value = funcionario.Status ?? 'Ativo';
+
+    setFormularioFuncionarioModo(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetFormularioFuncionario() {
+    const form = document.getElementById('form-funcionario');
+    if (!form) return;
+
+    form.reset();
+    const funcionarioIdField = document.getElementById('funcionario-id');
+    if (funcionarioIdField) funcionarioIdField.value = '';
+    setFormularioFuncionarioModo(false);
 }
 
 async function handleFuncionarioFormSubmit(event) {
@@ -361,11 +426,16 @@ async function handleFuncionarioFormSubmit(event) {
 
     event.preventDefault();
 
+    const funcionarioId = document.getElementById('funcionario-id')?.value;
+    const editando = funcionarioId && String(funcionarioId).trim() !== '';
+    const senhaValue = form.senha.value;
+
     const payload = {
+        ...(editando ? { funcionarioId: Number(funcionarioId) } : {}),
         nome: form.nome.value,
         cpf: form.cpf.value,
         email: form.email.value,
-        senha: form.senha.value,
+        ...(senhaValue ? { senha: senhaValue } : {}),
         perfilAcesso: form.perfilAcesso.value,
         cargoId: Number(form.cargoId.value),
         centroCustoId: Number(form.centroCustoId.value),
@@ -375,24 +445,29 @@ async function handleFuncionarioFormSubmit(event) {
         status: form.status.value
     };
 
-    const { response, payload: result } = await requestJson('/api/funcionarios', {
-        method: 'POST',
+    const { response, payload: result } = await requestJson(editando ? `/api/funcionarios/${encodeURIComponent(funcionarioId)}` : '/api/funcionarios', {
+        method: editando ? 'PUT' : 'POST',
         body: JSON.stringify(payload)
     });
 
     const feedback = document.getElementById('funcionario-feedback');
     if (feedback) {
-        feedback.textContent = resolveApiMessage(result, response?.ok ? 'Funcionário criado com sucesso.' : 'Falha ao criar funcionário.');
+        feedback.textContent = resolveApiMessage(
+            result,
+            response?.ok
+                ? (editando ? 'Funcionario atualizado com sucesso.' : 'Funcionario criado com sucesso.')
+                : (editando ? 'Falha ao atualizar funcionario.' : 'Falha ao criar funcionario.')
+        );
         feedback.className = `alert ${response?.ok ? 'alert-success' : 'alert-danger'}`;
         feedback.classList.remove('d-none');
     }
 
     if (response?.ok) {
-        form.reset();
+        resetFormularioFuncionario();
         await loadFuncionarios();
         hidePageMessage();
     } else {
-        showPageMessage(resolveApiMessage(result, 'Falha ao criar funcionário.'));
+        showPageMessage(resolveApiMessage(result, editando ? 'Falha ao atualizar funcionario.' : 'Falha ao criar funcionario.'));
     }
 }
 
@@ -607,6 +682,166 @@ async function handleRegistrarPonto() {
     hidePageMessage();
 }
 
+function formatDateInput(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function resolveEspelhoPeriodo() {
+    const inicioInput = document.getElementById('espelho-data-inicio');
+    const fimInput = document.getElementById('espelho-data-fim');
+    if (!inicioInput || !fimInput) {
+        return null;
+    }
+
+    let inicio = inicioInput.value;
+    let fim = fimInput.value;
+
+    if (!inicio || !fim) {
+        const hoje = new Date();
+        const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+
+        if (!inicio) {
+            inicio = formatDateInput(primeiroDia);
+            inicioInput.value = inicio;
+        }
+
+        if (!fim) {
+            fim = formatDateInput(hoje);
+            fimInput.value = fim;
+        }
+    }
+
+    return { inicio, fim };
+}
+
+async function loadEspelhoPonto() {
+    const container = document.getElementById('espelho-resultado');
+    if (!container) {
+        return;
+    }
+
+    const periodo = resolveEspelhoPeriodo();
+    if (!periodo) {
+        return;
+    }
+
+    const { response, payload } = await requestJson(`/api/ponto/espelho?inicio=${encodeURIComponent(periodo.inicio)}&fim=${encodeURIComponent(periodo.fim)}`);
+    if (!response?.ok || payload?.success === false) {
+        showPageMessage(resolveApiMessage(payload, 'Falha ao carregar espelho de ponto.'));
+        return;
+    }
+
+    const registros = payload?.data ?? [];
+    if (!registros.length) {
+        container.innerHTML = '<div class="text-muted">Nenhum registro encontrado no periodo informado.</div>';
+        return;
+    }
+
+    container.innerHTML = `
+        <table class="table table-sm table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Data / Hora</th>
+                    <th>Tipo</th>
+                    <th>Origem</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${registros.map((item) => `
+                    <tr>
+                        <td>${escapeHtml(formatDate(item.DataHoraRegistro))}</td>
+                        <td>${escapeHtml(item.TipoBatida ?? '-')}</td>
+                        <td>${escapeHtml(item.Origem ?? '-')}</td>
+                        <td>${escapeHtml(item.StatusAprovacao ?? '-')}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function handleEspelhoDownload() {
+    const periodo = resolveEspelhoPeriodo();
+    if (!periodo) {
+        return;
+    }
+
+    window.location.href = `/api/ponto/espelho/pdf?inicio=${encodeURIComponent(periodo.inicio)}&fim=${encodeURIComponent(periodo.fim)}`;
+}
+
+async function carregarFuncionariosHolerite() {
+    const select = document.getElementById('holerite-funcionario');
+    if (!select) {
+        return;
+    }
+
+    const { response, payload } = await requestJson('/api/funcionarios');
+    if (!response?.ok || payload?.success === false) {
+        showPageMessage(resolveApiMessage(payload, 'Falha ao carregar funcionarios.'));
+        return;
+    }
+
+    const funcionarios = payload?.data ?? [];
+    select.innerHTML = '<option value="">Selecione</option>' + funcionarios.map((item) => (
+        `<option value="${escapeHtml(item.FuncionarioID)}">${escapeHtml(item.Nome ?? '-')} (${escapeHtml(item.CPF ?? '-')})</option>`
+    )).join('');
+}
+
+async function setupHoleriteAdmin(user) {
+    const card = document.getElementById('holerite-admin-card');
+    if (!card) {
+        return;
+    }
+
+    if ((user?.PerfilAcesso ?? '') !== 'Administrador') {
+        card.classList.add('d-none');
+        return;
+    }
+
+    card.classList.remove('d-none');
+    await carregarFuncionariosHolerite();
+}
+
+async function handleHoleriteAdminSubmit(event) {
+    const form = event.target;
+    if (!form || form.id !== 'holerite-admin-form') {
+        return;
+    }
+
+    event.preventDefault();
+
+    const payload = {
+        funcionarioId: Number(document.getElementById('holerite-funcionario')?.value || 0),
+        mes: Number(document.getElementById('holerite-mes')?.value || 0),
+        ano: Number(document.getElementById('holerite-ano')?.value || 0),
+        diasTrabalhados: Number(document.getElementById('holerite-dias')?.value || 0)
+    };
+
+    const { response, payload: result } = await requestJson('/api/holerites', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    });
+
+    const feedback = document.getElementById('holerite-admin-feedback');
+    if (feedback) {
+        feedback.textContent = resolveApiMessage(result, response?.ok ? 'Holerite gerado com sucesso.' : 'Falha ao gerar holerite.');
+        feedback.className = `alert ${response?.ok ? 'alert-success' : 'alert-danger'}`;
+        feedback.classList.remove('d-none');
+    }
+
+    if (response?.ok) {
+        form.reset();
+        await loadHolerites();
+        hidePageMessage();
+    } else {
+        showPageMessage(resolveApiMessage(result, 'Falha ao gerar holerite.'));
+    }
+}
+
 async function loadHolerites() {
     const list = document.getElementById('holerites-list');
     if (!list) {
@@ -641,19 +876,33 @@ async function loadHolerites() {
 }
 
 async function initializePage() {
-    await loadCurrentUser();
+    const currentUser = await loadCurrentUser();
 
     document.getElementById('form-funcionario')?.addEventListener('submit', handleFuncionarioFormSubmit);
+    document.getElementById('funcionario-cancelar')?.addEventListener('click', resetFormularioFuncionario);
     document.getElementById('form-configuracao')?.addEventListener('submit', handleConfiguracaoFormSubmit);
     document.getElementById('registrar-ponto')?.addEventListener('click', handleRegistrarPonto);
+    document.getElementById('holerite-admin-form')?.addEventListener('submit', handleHoleriteAdminSubmit);
+    document.getElementById('espelho-download')?.addEventListener('click', handleEspelhoDownload);
+    document.getElementById('espelho-data-inicio')?.addEventListener('change', loadEspelhoPonto);
+    document.getElementById('espelho-data-fim')?.addEventListener('change', loadEspelhoPonto);
+
+    if (currentUser) {
+        await setupHoleriteAdmin(currentUser);
+    }
+
+    if (document.getElementById('form-funcionario')) {
+        setFormularioFuncionarioModo(false);
+    }
 
     await Promise.all([
         loadDashboard(),
         loadFuncionarios(),
         loadConfiguracoes(),
         loadLogs(),
-        loadMapa()
-        loadHolerites()
+        loadMapa(),
+        loadHolerites(),
+        loadEspelhoPonto()
     ]);
 }
 

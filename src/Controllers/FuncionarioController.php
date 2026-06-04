@@ -25,7 +25,7 @@ final class FuncionarioController
         try {
             if ($method === 'POST') {
                 $payload = $this->readJsonPayload();
-                $funcionario = $this->buildFuncionarioDTO($payload);
+                $funcionario = $this->buildFuncionarioDTO($payload, true);
                 $novoId = $this->funcionarioService->criar($funcionario);
 
                 JsonResponse::success(['FuncionarioID' => $novoId], 'Funcionario criado com sucesso.', 201);
@@ -53,6 +53,16 @@ final class FuncionarioController
                 }
 
                 JsonResponse::success($funcionario);
+                return;
+            }
+
+            if ($method === 'PUT' && $funcionarioId !== null) {
+                $payload = $this->readJsonPayload();
+                $payload['funcionarioId'] = $funcionarioId;
+                $funcionario = $this->buildFuncionarioDTO($payload, false);
+                $this->funcionarioService->atualizar($funcionario);
+
+                JsonResponse::success(null, 'Funcionario atualizado com sucesso.');
                 return;
             }
 
@@ -87,14 +97,17 @@ final class FuncionarioController
         return $payload;
     }
 
-    private function buildFuncionarioDTO(array $payload): FuncionarioDTO
+    private function buildFuncionarioDTO(array $payload, bool $requireSenha): FuncionarioDTO
     {
         $senhaHash = isset($payload['senhaHash']) ? trim((string) $payload['senhaHash']) : '';
         if ($senhaHash === '' && isset($payload['senha'])) {
-            $senhaHash = password_hash((string) $payload['senha'], PASSWORD_DEFAULT);
+            $senhaInformada = trim((string) $payload['senha']);
+            if ($senhaInformada !== '') {
+                $senhaHash = (string) password_hash($senhaInformada, PASSWORD_DEFAULT);
+            }
         }
 
-        if ($senhaHash === false || $senhaHash === '') {
+        if ($requireSenha && ($senhaHash === false || $senhaHash === '')) {
             throw new ValidationException('Senha ou SenhaHash deve ser informado.');
         }
 
@@ -104,14 +117,18 @@ final class FuncionarioController
             isset($payload['funcionarioId']) ? (int) $payload['funcionarioId'] : null,
             trim((string) ($payload['nome'] ?? '')),
             $cpfLimpo,
-            isset($payload['email']) ? trim((string) $payload['email']) : null,
-            $senhaHash,
+            isset($payload['email']) && trim((string) $payload['email']) !== ''
+                ? trim((string) $payload['email'])
+                : null,
+            $senhaHash === false ? '' : (string) $senhaHash,
             isset($payload['perfilAcesso']) && trim((string) $payload['perfilAcesso']) !== ''
                 ? trim((string) $payload['perfilAcesso'])
                 : 'Usuario',
             (int) ($payload['cargoId'] ?? 0),
             (int) ($payload['centroCustoId'] ?? 0),
-            isset($payload['supervisorId']) ? (int) $payload['supervisorId'] : null,
+            isset($payload['supervisorId']) && (string) $payload['supervisorId'] !== ''
+                ? (int) $payload['supervisorId']
+                : null,
             (string) ($payload['salarioAtual'] ?? '0'),
             (string) ($payload['dataAdmissao'] ?? ''),
             isset($payload['dataDesligamento']) && trim((string) $payload['dataDesligamento']) !== ''
