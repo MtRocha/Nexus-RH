@@ -104,7 +104,7 @@ function formatDate(value) {
         return '-';
     }
 
-    const date = new Date(value);
+    const date = parseLocalDateTime(value);
     if (Number.isNaN(date.getTime())) {
         return value;
     }
@@ -125,7 +125,7 @@ function formatCurrency(value) {
 }
 
 function formatTimeShort(value) {
-    const date = value instanceof Date ? value : new Date(value);
+    const date = parseLocalDateTime(value);
     if (Number.isNaN(date.getTime())) {
         return String(value ?? '-');
     }
@@ -134,6 +134,30 @@ function formatTimeShort(value) {
         hour: '2-digit',
         minute: '2-digit'
     });
+}
+
+function parseLocalDateTime(value) {
+    if (value instanceof Date) {
+        return value;
+    }
+
+    const text = String(value ?? '').trim();
+    if (text === '') {
+        return new Date('');
+    }
+
+    const match = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
+    if (match) {
+        const year = Number(match[1]);
+        const month = Number(match[2]) - 1;
+        const day = Number(match[3]);
+        const hour = Number(match[4] ?? 0);
+        const minute = Number(match[5] ?? 0);
+        const second = Number(match[6] ?? 0);
+        return new Date(year, month, day, hour, minute, second);
+    }
+
+    return new Date(text);
 }
 
 function startClock() {
