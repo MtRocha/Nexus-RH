@@ -28,6 +28,7 @@ final class Database
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
+            $this->connection->exec("SET time_zone = '-03:00'");
         } catch (PDOException $exception) {
             throw new PDOException('Falha na conexao com o banco de dados: ' . $exception->getMessage(), (int) $exception->getCode());
         }
