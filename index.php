@@ -47,6 +47,13 @@ $uri = $_SERVER['REQUEST_URI'] ?? '/';
 $path = parse_url($uri, PHP_URL_PATH) ?: '/';
 $normalizedPath = rtrim($path, '/');
 
+if (PHP_SAPI === 'cli-server') {
+    $requestedFile = __DIR__ . $path;
+    if ($path !== '/' && is_file($requestedFile)) {
+        return false;
+    }
+}
+
 if ($normalizedPath === '') {
     $normalizedPath = '/';
 }
